@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Anton"; src: url("assets/fonts/anton-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+      @font-face { font-family: "Mont"; src: url("assets/fonts/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+      @font-face { font-family: "Mont"; src: url("assets/fonts/montserrat-latin-900-normal.woff2") format("woff2"); font-weight: 900; }
+      :root {
+        --ground: #000;
+        --ink: #ffffff;
+        --pink: #ff2e7e;
+        --lime: #c6ff00;
+        --yellow: #ffd400;
+        --red: #ff3b30;
+        --font-display: "Anton", sans-serif;
+        --font-ui: "Mont", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--font-display); color: var(--ink); }
+      .bg { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; transform-origin: 50% 45%; }
+      .layer { position: absolute; inset: 0; pointer-events: none; }
+      #vignette { background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%),
+                  linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 18%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.45) 100%); }
+      #flash { background: #fff; opacity: 0; }
+
+      /* progress bar overlay */
+      #progress { position: absolute; left: 0; top: 0; height: 12px; width: 1080px; background: linear-gradient(90deg, var(--pink), var(--lime)); transform-origin: 0 50%; transform: scaleX(0); }
+
+      /* captions */
+      .cap { position: absolute; left: 70px; right: 70px; top: 1150px; text-align: center; font-size: 73px; line-height: 1.05;
+             letter-spacing: 0.01em; text-transform: uppercase; }
+      .cap .w { display: inline-block; color: #fff; -webkit-text-stroke: 7px #000; paint-order: stroke fill;
+                text-shadow: 0 8px 0 rgba(0,0,0,0.85); margin: 0 0.14em; }
+      .cap .w.on { color: var(--yellow); }
+      .cap .w.key.on { color: var(--lime); transform: scale(1.12); }
+
+      /* generic graphic blocks */
+      .g { position: absolute; }
+      .pill { display: inline-flex; align-items: center; gap: 22px; padding: 16px 30px; border-radius: 999px; font-family: var(--font-ui);
+              font-weight: 900; font-size: 41px; color: #000; background: #fff; box-shadow: 0 14px 0 rgba(0,0,0,0.35); white-space: nowrap; }
+      .pill svg { width: 45px; height: 45px; }
+      .pill.pink { background: var(--pink); color: #fff; }
+      .pill.lime { background: var(--lime); }
+      .pill.yellow { background: var(--yellow); }
+
+      /* hook */
+      #hook { left: 0; right: 0; top: 520px; text-align: center; }
+      #hook .l1 { font-size: 105px; line-height: 0.95; -webkit-text-stroke: 8px #000; paint-order: stroke fill; text-shadow: 0 12px 0 #000; }
+      #hook .l2 { display: inline-block; margin-top: 18px; font-size: 105px; white-space: nowrap; line-height: 0.95; color: #000; background: var(--lime);
+                  padding: 6px 40px 0; transform: rotate(-3deg); box-shadow: 0 16px 0 #000; }
+      #hook .l3 { margin-top: 36px; font-size: 77px; color: var(--yellow); -webkit-text-stroke: 7px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+
+      /* timer ring */
+      #timer { left: 90px; top: 250px; width: 210px; height: 210px; }
+      #timer svg { position: absolute; inset: 0; }
+      #timer .num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      #timer .num b { font-size: 91px; line-height: 0.9; font-weight: 400; }
+      #timer .num i { font-style: normal; font-family: var(--font-ui); font-weight: 900; font-size: 28px; color: var(--lime); }
+      #daily { left: 330px; top: 318px; }
+
+      #easy { left: 0; right: 0; top: 330px; text-align: center; }
+      #easy span { display: inline-block; font-size: 119px; color: #000; background: var(--yellow); padding: 0 50px; transform: rotate(4deg);
+                   box-shadow: 0 16px 0 #000; }
+
+      #sweat { left: 0; right: 0; top: 240px; text-align: center; }
+      #sweat .watch { display: inline-flex; align-items: center; gap: 20px; }
+      #sweat .big { font-size: 98px; -webkit-text-stroke: 7px #000; paint-order: stroke fill; }
+      #sweat .tag { display: inline-block; margin-top: 20px; font-size: 84px; color: #fff; background: var(--pink); padding: 0 40px; transform: rotate(-3deg); box-shadow: 0 14px 0 #000; }
+      .drop { position: absolute; width: 60px; height: 84px; }
+
+      #checks { left: 70px; top: 290px; display: flex; flex-direction: column; gap: 34px; align-items: flex-start; }
+
+      #total { left: 0; right: 0; top: 260px; text-align: center; }
+      #total div { font-size: 140px; line-height: 0.92; -webkit-text-stroke: 8px #000; paint-order: stroke fill; text-shadow: 0 12px 0 #000; }
+      #total .hl { display: inline-block; color: #000; background: var(--lime); -webkit-text-stroke: 0; padding: 4px 40px 0; text-shadow: none; box-shadow: 0 16px 0 #000; }
+
+      #stamp { left: 0; right: 0; top: 330px; text-align: center; }
+      #stamp span { display: inline-block; font-size: 112px; color: var(--red); border: 11px solid var(--red); border-radius: 24px; padding: 6px 40px 0;
+                    background: rgba(255,255,255,0.92); transform: rotate(-8deg); }
+
+      #callout { left: 0; top: 0; width: 1080px; height: 1920px; }
+      #callout .label { position: absolute; left: 100px; top: 300px; width: 880px; text-align: center; }
+      #callout .label .a { font-family: var(--font-ui); font-weight: 900; font-size: 32px; color: var(--lime); letter-spacing: 0.08em; }
+      #callout .label .b { font-size: 92px; line-height: 0.95; -webkit-text-stroke: 7px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+
+      #lcd { left: 250px; top: 240px; width: 580px; padding: 24px 34px; border-radius: 40px; background: rgba(12,14,18,0.92);
+             border: 6px solid var(--lime); box-shadow: 0 0 60px rgba(198,255,0,0.45), 0 18px 0 rgba(0,0,0,0.5); }
+      #lcd .row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 3px dashed rgba(198,255,0,0.3); }
+      #lcd .row:last-child { border-bottom: 0; }
+      #lcd .k { font-family: var(--font-ui); font-weight: 900; font-size: 34px; color: #9aa; letter-spacing: 0.06em; }
+      #lcd .v { font-size: 83px; line-height: 1; color: var(--lime); font-variant-numeric: tabular-nums; text-shadow: 0 0 24px rgba(198,255,0,0.6); }
+
+      #track { left: 70px; top: 290px; display: flex; flex-direction: column; gap: 34px; align-items: flex-start; }
+      #places { left: 70px; top: 290px; display: flex; flex-direction: column; gap: 34px; align-items: flex-start; }
+      #outside { left: 70px; top: 290px; }
+
+      #price { left: 0; right: 0; top: 230px; text-align: center; }
+      #price .tagbox { display: inline-block; position: relative; padding: 30px 70px 20px; background: var(--yellow); color: #000; border-radius: 30px;
+                       box-shadow: 0 18px 0 #000; transform-origin: 50% -40px; }
+      #price .tagbox .s { font-family: var(--font-ui); font-weight: 900; font-size: 35px; letter-spacing: 0.1em; }
+      #price .tagbox .m { font-size: 133px; line-height: 0.95; }
+      #rugi { left: 0; right: 0; top: 700px; text-align: center; }
+      #rugi span { display: inline-block; font-size: 91px; color: #fff; background: var(--red); padding: 0 40px; transform: rotate(-5deg); box-shadow: 0 14px 0 #000; }
+
+      #up { left: 0; right: 0; top: 250px; text-align: center; }
+      #up svg { width: 520px; height: 360px; }
+      #up .t { font-size: 98px; line-height: 0.95; color: #fff; -webkit-text-stroke: 7px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+      #up .t b { font-weight: 400; color: var(--red); }
+
+      #cta { left: 0; right: 0; top: 230px; text-align: center; }
+      #cta .card { display: inline-block; padding: 40px 60px 44px; border-radius: 44px; background: #fff; color: #000; box-shadow: 0 20px 0 rgba(0,0,0,0.45); }
+      #cta .card .a { font-family: var(--font-ui); font-weight: 900; font-size: 34px; color: var(--pink); letter-spacing: 0.06em; }
+      #cta .card .b { font-size: 105px; line-height: 0.95; }
+      #cta .bag { margin-top: 26px; display: inline-flex; align-items: center; gap: 24px; padding: 20px 46px; border-radius: 999px; background: var(--yellow);
+                  font-family: var(--font-ui); font-weight: 900; font-size: 39px; color: #000; box-shadow: 0 14px 0 #000; }
+      #cta .bag svg { width: 80px; height: 80px; }
+      #arrows { left: 120px; top: 1430px; display: flex; flex-direction: column; align-items: center; }
+      #arrows svg { width: 150px; height: 90px; margin-top: -20px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="33.2" data-width="1080" data-height="1920">
+      <!-- footage (muted b-roll) -->
+      <video class="clip bg" id="v0" src="assets/video/f17.mp4" muted playsinline data-start="0.00" data-duration="2.20" data-media-start="1.50" data-track-index="1"></video>
+      <video class="clip bg" id="v1" src="assets/video/f19.mp4" muted playsinline data-start="2.20" data-duration="3.35" data-media-start="0.00" data-track-index="1"></video>
+      <video class="clip bg" id="v2" src="assets/video/f2.mp4" muted playsinline data-start="5.55" data-duration="3.90" data-media-start="2.00" data-track-index="1"></video>
+      <video class="clip bg" id="v3" src="assets/video/f9.mp4" muted playsinline data-start="9.45" data-duration="3.60" data-media-start="0.00" data-track-index="1"></video>
+      <video class="clip bg" id="v4" src="assets/video/f6.mp4" muted playsinline data-start="13.05" data-duration="2.50" data-media-start="3.00" data-track-index="1"></video>
+      <video class="clip bg" id="v5" src="assets/video/f5.mp4" muted playsinline data-start="15.55" data-duration="3.75" data-media-start="50.90" data-track-index="1"></video>
+      <video class="clip bg" id="v6" src="assets/video/f5.mp4" muted playsinline data-start="19.30" data-duration="3.05" data-media-start="68.60" data-track-index="1"></video>
+      <video class="clip bg" id="v7" src="assets/video/f18.mp4" muted playsinline data-start="22.35" data-duration="2.50" data-media-start="5.00" data-track-index="1"></video>
+      <video class="clip bg" id="v8" src="assets/video/f7.mp4" muted playsinline data-start="24.85" data-duration="1.75" data-media-start="2.00" data-track-index="1"></video>
+      <video class="clip bg" id="v9" src="assets/video/f15.mp4" muted playsinline data-start="26.60" data-duration="6.60" data-media-start="0.50" data-track-index="1"></video>
+
+      <!-- voiceover: original audio, untouched -->
+      <audio id="vo" src="assets/vo.wav" data-start="0" data-duration="32.72" data-volume="1" data-track-index="2"></audio>
+
+      <!-- sound effects -->
+      <audio class="sfx" id="s0" src="assets/sfx/impact.wav" data-start="0.00" data-duration="0.90" data-volume="0.0825" data-track-index="30"></audio>
+      <audio class="sfx" id="s1" src="assets/sfx/whoosh.wav" data-start="0.02" data-duration="0.45" data-volume="0.0525" data-track-index="31"></audio>
+      <audio class="sfx" id="s2" src="assets/sfx/pop.wav" data-start="0.75" data-duration="0.12" data-volume="0.06" data-track-index="32"></audio>
+      <audio class="sfx" id="s3" src="assets/sfx/swoosh.wav" data-start="2.20" data-duration="0.35" data-volume="0.0525" data-track-index="33"></audio>
+      <audio class="sfx" id="s4" src="assets/sfx/pop.wav" data-start="3.70" data-duration="0.12" data-volume="0.06" data-track-index="30"></audio>
+      <audio class="sfx" id="s5" src="assets/sfx/ding.wav" data-start="4.95" data-duration="1.20" data-volume="0.0375" data-track-index="31"></audio>
+      <audio class="sfx" id="s6" src="assets/sfx/whoosh.wav" data-start="5.55" data-duration="0.45" data-volume="0.0525" data-track-index="32"></audio>
+      <audio class="sfx" id="s7" src="assets/sfx/pop.wav" data-start="5.70" data-duration="0.12" data-volume="0.06" data-track-index="33"></audio>
+      <audio class="sfx" id="s8" src="assets/sfx/tick.wav" data-start="7.45" data-duration="0.03" data-volume="0.075" data-track-index="30"></audio>
+      <audio class="sfx" id="s9" src="assets/sfx/pop.wav" data-start="8.38" data-duration="0.12" data-volume="0.06" data-track-index="31"></audio>
+      <audio class="sfx" id="s10" src="assets/sfx/swoosh.wav" data-start="9.45" data-duration="0.35" data-volume="0.0525" data-track-index="32"></audio>
+      <audio class="sfx" id="s11" src="assets/sfx/pop.wav" data-start="10.40" data-duration="0.12" data-volume="0.06" data-track-index="33"></audio>
+      <audio class="sfx" id="s12" src="assets/sfx/pop.wav" data-start="11.85" data-duration="0.12" data-volume="0.06" data-track-index="30"></audio>
+      <audio class="sfx" id="s13" src="assets/sfx/whoosh.wav" data-start="13.05" data-duration="0.45" data-volume="0.0525" data-track-index="31"></audio>
+      <audio class="sfx" id="s14" src="assets/sfx/impact.wav" data-start="14.95" data-duration="0.90" data-volume="0.06" data-track-index="32"></audio>
+      <audio class="sfx" id="s15" src="assets/sfx/swoosh.wav" data-start="15.55" data-duration="0.35" data-volume="0.045" data-track-index="33"></audio>
+      <audio class="sfx" id="s16" src="assets/sfx/impact.wav" data-start="15.65" data-duration="0.90" data-volume="0.0675" data-track-index="30"></audio>
+      <audio class="sfx" id="s17" src="assets/sfx/riser.wav" data-start="16.20" data-duration="1.20" data-volume="0.045" data-track-index="31"></audio>
+      <audio class="sfx" id="s18" src="assets/sfx/ding.wav" data-start="17.90" data-duration="1.20" data-volume="0.045" data-track-index="32"></audio>
+      <audio class="sfx" id="s19" src="assets/sfx/swoosh.wav" data-start="19.30" data-duration="0.35" data-volume="0.0525" data-track-index="33"></audio>
+      <audio class="sfx" id="s20" src="assets/sfx/pop.wav" data-start="20.35" data-duration="0.12" data-volume="0.06" data-track-index="30"></audio>
+      <audio class="sfx" id="s21" src="assets/sfx/pop.wav" data-start="21.10" data-duration="0.12" data-volume="0.06" data-track-index="31"></audio>
+      <audio class="sfx" id="s22" src="assets/sfx/whoosh.wav" data-start="22.35" data-duration="0.45" data-volume="0.0525" data-track-index="32"></audio>
+      <audio class="sfx" id="s23" src="assets/sfx/pop.wav" data-start="22.95" data-duration="0.12" data-volume="0.06" data-track-index="33"></audio>
+      <audio class="sfx" id="s24" src="assets/sfx/pop.wav" data-start="23.80" data-duration="0.12" data-volume="0.06" data-track-index="30"></audio>
+      <audio class="sfx" id="s25" src="assets/sfx/whoosh.wav" data-start="24.85" data-duration="0.45" data-volume="0.0525" data-track-index="31"></audio>
+      <audio class="sfx" id="s26" src="assets/sfx/pop.wav" data-start="25.50" data-duration="0.12" data-volume="0.06" data-track-index="32"></audio>
+      <audio class="sfx" id="s27" src="assets/sfx/whoosh.wav" data-start="26.60" data-duration="0.45" data-volume="0.0525" data-track-index="33"></audio>
+      <audio class="sfx" id="s28" src="assets/sfx/cash.wav" data-start="27.25" data-duration="1.00" data-volume="0.06" data-track-index="30"></audio>
+      <audio class="sfx" id="s29" src="assets/sfx/impact.wav" data-start="28.15" data-duration="0.90" data-volume="0.0675" data-track-index="31"></audio>
+      <audio class="sfx" id="s30" src="assets/sfx/swoosh.wav" data-start="29.30" data-duration="0.35" data-volume="0.0525" data-track-index="32"></audio>
+      <audio class="sfx" id="s31" src="assets/sfx/zap.wav" data-start="29.55" data-duration="0.35" data-volume="0.0525" data-track-index="33"></audio>
+      <audio class="sfx" id="s32" src="assets/sfx/whoosh.wav" data-start="30.45" data-duration="0.45" data-volume="0.0525" data-track-index="30"></audio>
+      <audio class="sfx" id="s33" src="assets/sfx/riser.wav" data-start="30.85" data-duration="1.20" data-volume="0.045" data-track-index="31"></audio>
+      <audio class="sfx" id="s34" src="assets/sfx/ding.wav" data-start="31.90" data-duration="1.20" data-volume="0.045" data-track-index="32"></audio>
+      <audio class="sfx" id="s35" src="assets/sfx/pop.wav" data-start="32.00" data-duration="0.12" data-volume="0.06" data-track-index="33"></audio>
+
+      <!-- overlays -->
+      <div id="vignette" class="layer"></div>
+
+      <!-- HOOK 0 - 1.5 -->
+      <div id="hook" class="g clip" data-start="0" data-duration="2.2" data-track-index="10">
+        <div class="l1">TRIM</div>
+        <div class="l1">GELEBEH</div>
+        <div class="l2">SEBELUM RAYA?</div>
+      </div>
+
+      <!-- 30 minit setiap hari -->
+      <div id="timer" class="g clip" data-start="3.7" data-duration="1.85" data-track-index="10">
+        <svg viewBox="0 0 300 300"><circle cx="150" cy="150" r="130" fill="rgba(0,0,0,0.75)" stroke="rgba(255,255,255,0.2)" stroke-width="22"/>
+          <circle id="ring" cx="150" cy="150" r="130" fill="none" stroke="#ff2e7e" stroke-width="22" stroke-linecap="round"
+            stroke-dasharray="817" stroke-dashoffset="817" transform="rotate(-90 150 150)"/></svg>
+        <div class="num"><b id="tnum">30</b><i>MINIT</i></div>
+      </div>
+      <div id="daily" class="g clip" data-start="4.95" data-duration="0.6" data-track-index="11"><div class="pill lime">SETIAP HARI</div></div>
+
+      <!-- nampak mudah -->
+      <div id="easy" class="g clip" data-start="5.64" data-duration="1.2" data-track-index="10"><span>MUDAH JE?</span></div>
+
+      <!-- 5 minit berpeluh -->
+      <div id="sweat" class="g clip" data-start="7.45" data-duration="2.0" data-track-index="10">
+        <div class="watch">
+          <svg width="130" height="150" viewBox="0 0 130 150"><rect x="50" y="0" width="30" height="18" rx="4" fill="#fff"/>
+            <circle cx="65" cy="85" r="56" fill="#fff" stroke="#000" stroke-width="8"/>
+            <line id="hand" x1="65" y1="85" x2="65" y2="42" stroke="#ff2e7e" stroke-width="10" stroke-linecap="round" style="transform-origin:65px 85px"/></svg>
+          <span class="big">5 MINIT</span>
+        </div>
+        <div><span class="tag" id="sweattag">DAH BERPELUH!</span></div>
+      </div>
+      <div class="g clip" id="drops" data-start="8.3" data-duration="1.15" data-track-index="11" style="left:0;top:0;width:1080px;height:1000px">
+        <svg class="drop" style="left:160px;top:200px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg>
+        <svg class="drop" style="left:860px;top:250px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg>
+        <svg class="drop" style="left:900px;top:520px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg>
+        <svg class="drop" style="left:110px;top:560px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg>
+      </div>
+
+      <!-- kaki + satu badan -->
+      <div id="checks" class="g clip" data-start="10.3" data-duration="2.75" data-track-index="10">
+        <div class="pill" id="ck1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>KAKI</div>
+        <div class="pill pink" id="ck2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>SATU BADAN</div>
+      </div>
+
+      <!-- total body workout -->
+      <div id="total" class="g clip" data-start="14.4" data-duration="1.1" data-track-index="10">
+        <div id="tw1">TOTAL</div>
+        <div id="tw2">BODY</div>
+        <div><span class="hl" id="tw3">WORKOUT</span></div>
+      </div>
+
+      <!-- efektif gila -->
+      <div id="stamp" class="g clip" data-start="15.62" data-duration="0.95" data-track-index="10"><span>PALING PENTING!</span></div>
+
+      <!-- multifunction counter callout -->
+      <div id="callout" class="g clip" data-start="16.6" data-duration="2.7" data-track-index="10">
+                <div class="label"><div class="a">DATANG SEKALI DENGAN</div><div class="b">MULTIFUNCTION<br>COUNTER</div></div>
+      </div>
+
+      <!-- LCD counter -->
+      <div id="track" class="g clip" data-start="20.3" data-duration="2.05" data-track-index="10">
+        <div class="pill lime" id="tr1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>TRACK STEPS</div>
+        <div class="pill pink" id="tr2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>KALORI DIBAKAR</div>
+      </div>
+
+      <!-- places -->
+      <div id="places" class="g clip" data-start="22.9" data-duration="1.95" data-track-index="10">
+        <div class="pill lime" id="pl2"><svg viewBox="0 0 64 64"><rect x="4" y="10" width="56" height="36" rx="5" fill="#000"/><rect x="10" y="16" width="44" height="24" fill="#5ad1ff"/><path d="M22 56 L42 56 M32 46 L32 56" stroke="#000" stroke-width="6" stroke-linecap="round"/></svg>DEPAN TV</div>
+        <div class="pill" id="pl1"><svg viewBox="0 0 64 64"><path d="M6 30 L32 8 L58 30" fill="none" stroke="#ff2e7e" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><rect x="14" y="28" width="36" height="28" fill="#ff2e7e"/><rect x="27" y="40" width="10" height="16" fill="#fff"/></svg>DALAM BILIK</div>
+      </div>
+      <div id="outside" class="g clip" data-start="25.0" data-duration="1.6" data-track-index="10">
+        <div class="pill yellow"><svg viewBox="0 0 64 64"><circle cx="46" cy="16" r="10" fill="#ff8a00"/><path d="M20 10 L6 40 L34 40 Z" fill="#1a8f3c"/><rect x="17" y="40" width="6" height="16" fill="#6b3d1f"/><rect x="2" y="56" width="60" height="6" rx="3" fill="#1a8f3c"/></svg>KAT LUAR PUN BOLEH</div>
+      </div>
+
+      <!-- price -->
+      <div id="price" class="g clip" data-start="27.2" data-duration="1.86" data-track-index="10">
+        <div class="tagbox" id="tagbox"><div class="s">HARGA TENGAH</div><div class="m">MURAH!</div></div>
+      </div>
+      <div id="rugi" class="g clip" data-start="28.15" data-duration="0.91" data-track-index="11"><span>RUGI TAK GRAB!</span></div>
+
+      <!-- price going up -->
+      <div id="up" class="g clip" data-start="29.3" data-duration="1.15" data-track-index="10">
+        <svg viewBox="0 0 520 360"><path id="upline" d="M20 320 L150 250 L240 280 L360 150 L470 60" fill="none" stroke="#ff3b30" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="620" stroke-dashoffset="620"/>
+          <path id="uphead" d="M420 40 L500 30 L490 110 Z" fill="#ff3b30" opacity="0"/></svg>
+        <div class="t">HARGA AKAN <b>NAIK!</b></div>
+      </div>
+
+      <!-- CTA -->
+      <div id="cta" class="g clip" data-start="30.45" data-duration="2.75" data-track-index="10">
+        <div class="card" id="ctacard"><div class="a">SEBELUM TERLEPAS</div><div class="b">CHECK OUT<br>SEKARANG!</div></div>
+        <div><div class="bag" id="ctabag"><svg viewBox="0 0 80 80"><path d="M14 26 H66 L62 72 H18 Z" fill="#ffd400" stroke="#000" stroke-width="6" stroke-linejoin="round"/><path d="M28 30 V20 A12 12 0 0 1 52 20 V30" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round"/></svg>BEG KUNING BAWAH NI</div></div>
+      </div>
+      <div id="arrows" class="g clip" data-start="31.95" data-duration="1.25" data-track-index="11">
+        <svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- captions -->
+      <div class="cap clip" id="cap3" data-start="2.16" data-duration="0.80" data-track-index="20"><span class="w" id="cap3w0">KORANG</span> <span class="w" id="cap3w1">BUAT</span> <span class="w" id="cap3w2">JE</span></div>
+      <div class="cap clip" id="cap4" data-start="2.96" data-duration="0.72" data-track-index="20"><span class="w" id="cap4w0">LATIHAN</span> <span class="w key" id="cap4w1">STEPPER</span> <span class="w" id="cap4w2">MACAM</span></div>
+      <div class="cap clip" id="cap5" data-start="3.68" data-duration="1.30" data-track-index="20"><span class="w" id="cap5w0">NI</span> <span class="w key" id="cap5w1">30</span> <span class="w key" id="cap5w2">MINIT</span></div>
+      <div class="cap clip" id="cap6" data-start="4.98" data-duration="0.47" data-track-index="20"><span class="w" id="cap6w0">SETIAP</span> <span class="w" id="cap6w1">HARI.</span></div>
+      <div class="cap clip" id="cap7" data-start="5.64" data-duration="0.90" data-track-index="20"><span class="w" id="cap7w0">NAMPAK</span> <span class="w" id="cap7w1">MACAM</span> <span class="w key" id="cap7w2">MUDAH</span></div>
+      <div class="cap clip" id="cap8" data-start="6.54" data-duration="0.32" data-track-index="20"><span class="w" id="cap8w0">JE</span> <span class="w" id="cap8w1">KAN?</span></div>
+      <div class="cap clip" id="cap9" data-start="6.86" data-duration="0.74" data-track-index="20"><span class="w" id="cap9w0">TAPI</span> <span class="w" id="cap9w1">KALAU</span> <span class="w" id="cap9w2">KORANG</span></div>
+      <div class="cap clip" id="cap10" data-start="7.60" data-duration="0.78" data-track-index="20"><span class="w" id="cap10w0">BUAT</span> <span class="w key" id="cap10w1">5</span> <span class="w key" id="cap10w2">MINIT</span> <span class="w" id="cap10w3">JE</span></div>
+      <div class="cap clip" id="cap11" data-start="8.38" data-duration="1.17" data-track-index="20"><span class="w" id="cap11w0">DAH</span> <span class="w key" id="cap11w1">BERPELUH</span> <span class="w key" id="cap11w2">GILA</span> <span class="w" id="cap11w3">TAU.</span></div>
+      <div class="cap clip" id="cap12" data-start="9.56" data-duration="0.74" data-track-index="20"><span class="w" id="cap12w0">BUKAN</span> <span class="w" id="cap12w1">SETAKAT</span> <span class="w" id="cap12w2">LATIHAN</span></div>
+      <div class="cap clip" id="cap13" data-start="10.30" data-duration="0.76" data-track-index="20"><span class="w" id="cap13w0">OTOT</span> <span class="w key" id="cap13w1">KAKI</span> <span class="w" id="cap13w2">JE</span></div>
+      <div class="cap clip" id="cap14" data-start="11.06" data-duration="1.00" data-track-index="20"><span class="w" id="cap14w0">TAPI</span> <span class="w" id="cap14w1">MUSCLE</span> <span class="w" id="cap14w2">SATU</span></div>
+      <div class="cap clip" id="cap15" data-start="12.06" data-duration="1.03" data-track-index="20"><span class="w key" id="cap15w0">BADAN</span> <span class="w" id="cap15w1">PUN</span> <span class="w" id="cap15w2">AKAN</span> <span class="w" id="cap15w3">BEKERJA.</span></div>
+      <div class="cap clip" id="cap16" data-start="13.14" data-duration="1.30" data-track-index="20"><span class="w" id="cap16w0">SEBAB</span> <span class="w" id="cap16w1">LATIHAN</span> <span class="w key" id="cap16w2">STEPPER</span> <span class="w" id="cap16w3">NI</span></div>
+      <div class="cap clip" id="cap17" data-start="14.44" data-duration="1.03" data-track-index="20"><span class="w" id="cap17w0">DIA</span> <span class="w key" id="cap17w1">TOTAL</span> <span class="w key" id="cap17w2">BODY</span> <span class="w key" id="cap17w3">WORKOUT.</span></div>
+      <div class="cap clip" id="cap18" data-start="15.62" data-duration="0.98" data-track-index="20"><span class="w" id="cap18w0">DAN</span> <span class="w" id="cap18w1">YANG</span> <span class="w" id="cap18w2">PALING</span> <span class="w" id="cap18w3">PENTING</span></div>
+      <div class="cap clip" id="cap19" data-start="16.60" data-duration="0.72" data-track-index="20"><span class="w" id="cap19w0">DIA</span> <span class="w" id="cap19w1">DATANG</span> <span class="w" id="cap19w2">SEKALI</span></div>
+      <div class="cap clip" id="cap20" data-start="17.32" data-duration="1.36" data-track-index="20"><span class="w" id="cap20w0">DENGAN</span> <span class="w key" id="cap20w1">MULTIFUNCTION</span> <span class="w key" id="cap20w2">COUNTER</span></div>
+      <div class="cap clip" id="cap21" data-start="18.68" data-duration="0.67" data-track-index="20"><span class="w" id="cap21w0">MACAM</span> <span class="w" id="cap21w1">NI.</span></div>
+      <div class="cap clip" id="cap22" data-start="19.36" data-duration="0.70" data-track-index="20"><span class="w" id="cap22w0">SENANG</span> <span class="w" id="cap22w1">KORANG</span> <span class="w" id="cap22w2">NAK</span></div>
+      <div class="cap clip" id="cap23" data-start="20.06" data-duration="0.60" data-track-index="20"><span class="w" id="cap23w0">TRACK</span> <span class="w" id="cap23w1">JUMLAH</span> <span class="w key" id="cap23w2">STEPS</span></div>
+      <div class="cap clip" id="cap24" data-start="20.66" data-duration="0.94" data-track-index="20"><span class="w" id="cap24w0">DAN</span> <span class="w key" id="cap24w1">KALORI</span> <span class="w" id="cap24w2">YANG</span></div>
+      <div class="cap clip" id="cap25" data-start="21.60" data-duration="0.79" data-track-index="20"><span class="w" id="cap25w0">KORANG</span> <span class="w" id="cap25w1">DAH</span> <span class="w" id="cap25w2">BAKAR</span> <span class="w" id="cap25w3">TU.</span></div>
+      <div class="cap clip" id="cap26" data-start="22.42" data-duration="0.80" data-track-index="20"><span class="w" id="cap26w0">NAK</span> <span class="w key" id="cap26w1">WORKOUT</span> <span class="w" id="cap26w2">DEPAN</span></div>
+      <div class="cap clip" id="cap27" data-start="23.22" data-duration="0.62" data-track-index="20"><span class="w key" id="cap27w0">TV</span> <span class="w" id="cap27w1">KE</span></div>
+      <div class="cap clip" id="cap28" data-start="23.84" data-duration="1.06" data-track-index="20"><span class="w" id="cap28w0">DALAM</span> <span class="w key" id="cap28w1">BILIK</span></div>
+      <div class="cap clip" id="cap29" data-start="24.90" data-duration="0.82" data-track-index="20"><span class="w" id="cap29w0">ATAUPUN</span> <span class="w" id="cap29w1">NAK</span> <span class="w" id="cap29w2">BUAT</span></div>
+      <div class="cap clip" id="cap30" data-start="25.72" data-duration="0.40" data-track-index="20"><span class="w" id="cap30w0">KAT</span> <span class="w key" id="cap30w1">LUAR</span> <span class="w" id="cap30w2">PUN</span></div>
+      <div class="cap clip" id="cap31" data-start="26.12" data-duration="0.51" data-track-index="20"><span class="w" id="cap31w0">BOLEH</span> <span class="w" id="cap31w1">TAU.</span></div>
+      <div class="cap clip" id="cap32" data-start="26.70" data-duration="0.76" data-track-index="20"><span class="w key" id="cap32w0">SEKARANG</span> <span class="w" id="cap32w1">HARGA</span> <span class="w" id="cap32w2">TENGAH</span></div>
+      <div class="cap clip" id="cap33" data-start="27.46" data-duration="0.63" data-track-index="20"><span class="w key" id="cap33w0">MURAH</span> <span class="w" id="cap33w1">SANGAT</span></div>
+      <div class="cap clip" id="cap34" data-start="28.18" data-duration="0.88" data-track-index="20"><span class="w key" id="cap34w0">RUGI</span> <span class="w" id="cap34w1">KORANG</span> <span class="w" id="cap34w2">TAK</span> <span class="w key" id="cap34w3">GRAB.</span></div>
+      <div class="cap clip" id="cap35" data-start="29.06" data-duration="0.90" data-track-index="20"><span class="w" id="cap35w0">SO</span> <span class="w" id="cap35w1">SEBELUM</span> <span class="w" id="cap35w2">HARGA</span></div>
+      <div class="cap clip" id="cap36" data-start="29.96" data-duration="0.50" data-track-index="20"><span class="w key" id="cap36w0">NAIK</span> <span class="w" id="cap36w1">BALIK</span></div>
+      <div class="cap clip" id="cap37" data-start="30.46" data-duration="0.80" data-track-index="20"><span class="w" id="cap37w0">BETTER</span> <span class="w" id="cap37w1">KORANG</span> <span class="w" id="cap37w2">CHECK</span></div>
+      <div class="cap clip" id="cap38" data-start="31.26" data-duration="0.66" data-track-index="20"><span class="w" id="cap38w0">OUT</span> <span class="w key" id="cap38w1">SEKARANG</span> <span class="w" id="cap38w2">DEKAT</span></div>
+      <div class="cap clip" id="cap39" data-start="31.92" data-duration="1.23" data-track-index="20"><span class="w key" id="cap39w0">BEG</span> <span class="w key" id="cap39w1">KUNING</span> <span class="w" id="cap39w2">BAWAH</span> <span class="w" id="cap39w3">NI.</span></div>
+
+      <div id="flash" class="layer"></div>
+      <div id="progress"></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#v0",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},0.00);
+      tl.to("#v0",{scale:1.0,duration:1.85,ease:"none"},0.35);
+      tl.fromTo("#v1",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},2.20);
+      tl.to("#v1",{scale:1.0,duration:3.00,ease:"none"},2.55);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},2.20);
+      tl.fromTo("#v2",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},5.55);
+      tl.to("#v2",{scale:1.0,duration:3.55,ease:"none"},5.90);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},5.55);
+      tl.fromTo("#v3",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},9.45);
+      tl.to("#v3",{scale:1.0,duration:3.25,ease:"none"},9.80);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},9.45);
+      tl.fromTo("#v4",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},13.05);
+      tl.to("#v4",{scale:1.0,duration:2.15,ease:"none"},13.40);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},13.05);
+      tl.fromTo("#v5",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},15.55);
+      tl.to("#v5",{scale:1.0,duration:3.40,ease:"none"},15.90);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},15.55);
+      tl.fromTo("#v6",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},19.30);
+      tl.to("#v6",{scale:1.0,duration:2.70,ease:"none"},19.65);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},19.30);
+      tl.fromTo("#v7",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},22.35);
+      tl.to("#v7",{scale:1.0,duration:2.15,ease:"none"},22.70);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},22.35);
+      tl.fromTo("#v8",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},24.85);
+      tl.to("#v8",{scale:1.0,duration:1.40,ease:"none"},25.20);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},24.85);
+      tl.fromTo("#v9",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},26.60);
+      tl.to("#v9",{scale:1.0,duration:6.25,ease:"none"},26.95);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},26.60);
+
+      // progress bar overlay
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: 33.2, ease: "none" }, 0);
+
+      // HOOK
+      tl.fromTo("#hook .l1", { scale: 2.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.22, ease: "power4.out", stagger: 0.18 }, 0.0);
+      tl.fromTo("#hook .l2", { scale: 0, rotation: -20 }, { scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }, 0.75);
+      tl.to("#hook", { scale: 1.06, duration: 1.3, ease: "none" }, 0.9);
+      tl.to("#root", { keyframes: { x: [0, -14, 12, -8, 6, 0] }, duration: 0.25 }, 0.0);
+
+      // timer
+      tl.fromTo("#timer", { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.35, ease: "back.out(2)" }, 3.7);
+      tl.fromTo("#ring", { attr: { "stroke-dashoffset": 817 } }, { attr: { "stroke-dashoffset": 0 }, duration: 1.5, ease: "power2.inOut" }, 3.95);
+      const tn = { v: 0 };
+      tl.fromTo(tn, { v: 0 }, { v: 30, duration: 1.4, ease: "power2.out", onUpdate: () => { document.getElementById("tnum").textContent = Math.round(tn.v); } }, 4.1);
+      tl.fromTo("#daily", { x: 400, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "back.out(1.8)" }, 4.95);
+
+      // mudah
+      tl.fromTo("#easy span", { scale: 0, rotation: 30 }, { scale: 1, rotation: 4, duration: 0.3, ease: "back.out(2.5)" }, 5.64);
+      tl.to("#easy span", { rotation: -4, duration: 0.25, yoyo: true, repeat: 2, ease: "sine.inOut" }, 5.95);
+
+      // 5 minit berpeluh
+      tl.fromTo("#sweat .watch", { y: -200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 7.45);
+      tl.fromTo("#hand", { rotation: 0 }, { rotation: 720, duration: 1.2, ease: "power1.inOut" }, 7.65);
+      tl.fromTo("#sweattag", { scale: 0 }, { scale: 1, duration: 0.28, ease: "back.out(3)" }, 8.38);
+      tl.fromTo("#drops .drop", { y: -120, opacity: 0, scale: 0.4 }, { y: 120, opacity: 1, scale: 1, duration: 0.9, ease: "power2.in", stagger: 0.08 }, 8.3);
+
+      // checks
+      tl.fromTo("#ck1", { x: -700 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 10.4);
+      tl.fromTo("#ck2", { x: -900 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 11.85);
+      tl.to("#ck2", { scale: 1.08, duration: 0.2, yoyo: true, repeat: 3, ease: "sine.inOut" }, 12.3);
+
+      // total body workout
+      tl.fromTo("#tw1", { x: -1100 }, { x: 0, duration: 0.25, ease: "power4.out" }, 14.45);
+      tl.fromTo("#tw2", { x: 1100 }, { x: 0, duration: 0.25, ease: "power4.out" }, 14.72);
+      tl.fromTo("#tw3", { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "power4.out" }, 14.95);
+      tl.to("#root", { keyframes: { y: [0, 12, -10, 6, 0] }, duration: 0.22 }, 14.97);
+
+      // efektif stamp
+      tl.fromTo("#stamp span", { scale: 3, opacity: 0, rotation: -25 }, { scale: 1, opacity: 1, rotation: -8, duration: 0.2, ease: "power4.in" }, 15.62);
+      tl.to("#root", { keyframes: { x: [0, 14, -12, 8, 0] }, duration: 0.22 }, 15.82);
+
+      // callout
+      tl.fromTo("#callout .label", { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "back.out(1.8)" }, 16.6);
+
+
+
+      // track steps + kalori
+      tl.fromTo("#tr1", { x: -800 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 20.35);
+      tl.fromTo("#tr2", { x: -900 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 21.1);
+
+      // places
+      tl.fromTo("#pl1", { x: -800 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 23.8);
+      tl.fromTo("#pl2", { x: -800 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 22.95);
+      tl.fromTo("#outside .pill", { scale: 0, rotation: -10 }, { scale: 1, rotation: 0, duration: 0.35, ease: "back.out(2)" }, 25.5);
+
+      // price
+      tl.fromTo("#tagbox", { y: -500, rotation: 0 }, { y: 0, duration: 0.35, ease: "power3.out" }, 27.2);
+      tl.fromTo("#tagbox", { rotation: 12 }, { rotation: 0, duration: 1.2, ease: "elastic.out(1.2,0.25)" }, 27.5);
+      tl.fromTo("#rugi span", { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.2, ease: "power4.in" }, 28.1);
+      tl.to("#root", { keyframes: { x: [0, -12, 10, -6, 0] }, duration: 0.22 }, 28.3);
+
+      // price up
+      tl.fromTo("#up .t", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 29.3);
+      tl.fromTo("#upline", { attr: { "stroke-dashoffset": 620 } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.6, ease: "power2.in" }, 29.5);
+      tl.fromTo("#uphead", { opacity: 0 }, { opacity: 1, duration: 0.05 }, 30.05);
+
+      // CTA
+      tl.fromTo("#ctacard", { scale: 0, rotation: -8 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2)" }, 30.5);
+      tl.fromTo("#ctabag", { y: 300, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "back.out(2)" }, 31.9);
+      tl.to("#ctabag", { scale: 1.08, duration: 0.25, yoyo: true, repeat: 5, ease: "sine.inOut" }, 32.25);
+      tl.fromTo("#arrows svg", { y: -30, opacity: 0 }, { y: 20, opacity: 1, duration: 0.4, stagger: 0.12, repeat: 2, yoyo: true, ease: "sine.inOut" }, 31.95);
+
+      // captions
+      tl.set("#cap3w0",{className:"w on"},2.16);
+      tl.set("#cap3w1",{className:"w on"},2.70);
+      tl.set("#cap3w2",{className:"w on"},2.86);
+      tl.fromTo("#cap3",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},2.16);
+      tl.set("#cap4w0",{className:"w on"},2.96);
+      tl.set("#cap4w1",{className:"w key on"},3.16);
+      tl.set("#cap4w2",{className:"w on"},3.46);
+      tl.fromTo("#cap4",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},2.96);
+      tl.set("#cap5w0",{className:"w on"},3.68);
+      tl.set("#cap5w1",{className:"w key on"},3.96);
+      tl.set("#cap5w2",{className:"w key on"},4.54);
+      tl.fromTo("#cap5",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},3.68);
+      tl.set("#cap6w0",{className:"w on"},4.98);
+      tl.set("#cap6w1",{className:"w on"},5.18);
+      tl.fromTo("#cap6",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},4.98);
+      tl.set("#cap7w0",{className:"w on"},5.64);
+      tl.set("#cap7w1",{className:"w on"},6.04);
+      tl.set("#cap7w2",{className:"w key on"},6.14);
+      tl.fromTo("#cap7",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},5.64);
+      tl.set("#cap8w0",{className:"w on"},6.54);
+      tl.set("#cap8w1",{className:"w on"},6.62);
+      tl.fromTo("#cap8",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},6.54);
+      tl.set("#cap9w0",{className:"w on"},6.86);
+      tl.set("#cap9w1",{className:"w on"},7.20);
+      tl.set("#cap9w2",{className:"w on"},7.36);
+      tl.fromTo("#cap9",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},6.86);
+      tl.set("#cap10w0",{className:"w on"},7.60);
+      tl.set("#cap10w1",{className:"w key on"},7.72);
+      tl.set("#cap10w2",{className:"w key on"},7.84);
+      tl.set("#cap10w3",{className:"w on"},8.14);
+      tl.fromTo("#cap10",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},7.60);
+      tl.set("#cap11w0",{className:"w on"},8.38);
+      tl.set("#cap11w1",{className:"w key on"},8.72);
+      tl.set("#cap11w2",{className:"w key on"},8.98);
+      tl.set("#cap11w3",{className:"w on"},9.26);
+      tl.fromTo("#cap11",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},8.38);
+      tl.set("#cap12w0",{className:"w on"},9.56);
+      tl.set("#cap12w1",{className:"w on"},9.96);
+      tl.set("#cap12w2",{className:"w on"},10.14);
+      tl.fromTo("#cap12",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},9.56);
+      tl.set("#cap13w0",{className:"w on"},10.30);
+      tl.set("#cap13w1",{className:"w key on"},10.46);
+      tl.set("#cap13w2",{className:"w on"},10.82);
+      tl.fromTo("#cap13",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},10.30);
+      tl.set("#cap14w0",{className:"w on"},11.06);
+      tl.set("#cap14w1",{className:"w on"},11.62);
+      tl.set("#cap14w2",{className:"w on"},11.90);
+      tl.fromTo("#cap14",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},11.06);
+      tl.set("#cap15w0",{className:"w key on"},12.06);
+      tl.set("#cap15w1",{className:"w on"},12.40);
+      tl.set("#cap15w2",{className:"w on"},12.48);
+      tl.set("#cap15w3",{className:"w on"},12.58);
+      tl.fromTo("#cap15",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},12.06);
+      tl.set("#cap16w0",{className:"w on"},13.14);
+      tl.set("#cap16w1",{className:"w on"},13.54);
+      tl.set("#cap16w2",{className:"w key on"},13.78);
+      tl.set("#cap16w3",{className:"w on"},14.14);
+      tl.fromTo("#cap16",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},13.14);
+      tl.set("#cap17w0",{className:"w on"},14.44);
+      tl.set("#cap17w1",{className:"w key on"},14.70);
+      tl.set("#cap17w2",{className:"w key on"},14.88);
+      tl.set("#cap17w3",{className:"w key on"},15.04);
+      tl.fromTo("#cap17",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},14.44);
+      tl.set("#cap18w0",{className:"w on"},15.62);
+      tl.set("#cap18w1",{className:"w on"},15.82);
+      tl.set("#cap18w2",{className:"w on"},15.94);
+      tl.set("#cap18w3",{className:"w on"},16.04);
+      tl.fromTo("#cap18",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},15.62);
+      tl.set("#cap19w0",{className:"w on"},16.60);
+      tl.set("#cap19w1",{className:"w on"},16.88);
+      tl.set("#cap19w2",{className:"w on"},17.18);
+      tl.fromTo("#cap19",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},16.60);
+      tl.set("#cap20w0",{className:"w on"},17.32);
+      tl.set("#cap20w1",{className:"w key on"},17.92);
+      tl.set("#cap20w2",{className:"w key on"},18.44);
+      tl.fromTo("#cap20",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},17.32);
+      tl.set("#cap21w0",{className:"w on"},18.68);
+      tl.set("#cap21w1",{className:"w on"},19.00);
+      tl.fromTo("#cap21",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},18.68);
+      tl.set("#cap22w0",{className:"w on"},19.36);
+      tl.set("#cap22w1",{className:"w on"},19.76);
+      tl.set("#cap22w2",{className:"w on"},19.96);
+      tl.fromTo("#cap22",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},19.36);
+      tl.set("#cap23w0",{className:"w on"},20.06);
+      tl.set("#cap23w1",{className:"w on"},20.16);
+      tl.set("#cap23w2",{className:"w key on"},20.42);
+      tl.fromTo("#cap23",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},20.06);
+      tl.set("#cap24w0",{className:"w on"},20.66);
+      tl.set("#cap24w1",{className:"w key on"},21.16);
+      tl.set("#cap24w2",{className:"w on"},21.48);
+      tl.fromTo("#cap24",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},20.66);
+      tl.set("#cap25w0",{className:"w on"},21.60);
+      tl.set("#cap25w1",{className:"w on"},21.74);
+      tl.set("#cap25w2",{className:"w on"},21.80);
+      tl.set("#cap25w3",{className:"w on"},22.12);
+      tl.fromTo("#cap25",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},21.60);
+      tl.set("#cap26w0",{className:"w on"},22.42);
+      tl.set("#cap26w1",{className:"w key on"},22.78);
+      tl.set("#cap26w2",{className:"w on"},22.98);
+      tl.fromTo("#cap26",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},22.42);
+      tl.set("#cap27w0",{className:"w key on"},23.22);
+      tl.set("#cap27w1",{className:"w on"},23.48);
+      tl.fromTo("#cap27",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},23.22);
+      tl.set("#cap28w0",{className:"w on"},23.84);
+      tl.set("#cap28w1",{className:"w key on"},24.36);
+      tl.fromTo("#cap28",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},23.84);
+      tl.set("#cap29w0",{className:"w on"},24.90);
+      tl.set("#cap29w1",{className:"w on"},25.50);
+      tl.set("#cap29w2",{className:"w on"},25.60);
+      tl.fromTo("#cap29",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},24.90);
+      tl.set("#cap30w0",{className:"w on"},25.72);
+      tl.set("#cap30w1",{className:"w key on"},25.82);
+      tl.set("#cap30w2",{className:"w on"},25.98);
+      tl.fromTo("#cap30",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},25.72);
+      tl.set("#cap31w0",{className:"w on"},26.12);
+      tl.set("#cap31w1",{className:"w on"},26.34);
+      tl.fromTo("#cap31",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},26.12);
+      tl.set("#cap32w0",{className:"w key on"},26.70);
+      tl.set("#cap32w1",{className:"w on"},27.10);
+      tl.set("#cap32w2",{className:"w on"},27.36);
+      tl.fromTo("#cap32",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},26.70);
+      tl.set("#cap33w0",{className:"w key on"},27.46);
+      tl.set("#cap33w1",{className:"w on"},27.74);
+      tl.fromTo("#cap33",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},27.46);
+      tl.set("#cap34w0",{className:"w key on"},28.18);
+      tl.set("#cap34w1",{className:"w on"},28.56);
+      tl.set("#cap34w2",{className:"w on"},28.74);
+      tl.set("#cap34w3",{className:"w key on"},28.84);
+      tl.fromTo("#cap34",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},28.18);
+      tl.set("#cap35w0",{className:"w on"},29.06);
+      tl.set("#cap35w1",{className:"w on"},29.40);
+      tl.set("#cap35w2",{className:"w on"},29.72);
+      tl.fromTo("#cap35",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},29.06);
+      tl.set("#cap36w0",{className:"w key on"},29.96);
+      tl.set("#cap36w1",{className:"w on"},30.10);
+      tl.fromTo("#cap36",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},29.96);
+      tl.set("#cap37w0",{className:"w on"},30.46);
+      tl.set("#cap37w1",{className:"w on"},30.90);
+      tl.set("#cap37w2",{className:"w on"},31.14);
+      tl.fromTo("#cap37",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},30.46);
+      tl.set("#cap38w0",{className:"w on"},31.26);
+      tl.set("#cap38w1",{className:"w key on"},31.38);
+      tl.set("#cap38w2",{className:"w on"},31.58);
+      tl.fromTo("#cap38",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},31.26);
+      tl.set("#cap39w0",{className:"w key on"},31.92);
+      tl.set("#cap39w1",{className:"w key on"},32.02);
+      tl.set("#cap39w2",{className:"w on"},32.28);
+      tl.set("#cap39w3",{className:"w on"},32.50);
+      tl.fromTo("#cap39",{scale:0.6,y:30,opacity:0},{scale:1,y:0,opacity:1,duration:0.18,ease:"back.out(2.5)"},31.92);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
