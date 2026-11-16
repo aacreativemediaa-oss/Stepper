@@ -31,91 +31,92 @@
       #progress { position: absolute; left: 0; top: 0; height: 12px; width: 1080px; background: linear-gradient(90deg, var(--pink), var(--lime)); transform-origin: 0 50%; transform: scaleX(0); }
 
       /* captions */
-      .cap { position: absolute; left: 70px; right: 70px; top: 1150px; text-align: center; font-size: 104px; line-height: 1.05;
+      .cap { position: absolute; left: 70px; right: 70px; top: 1150px; text-align: center; font-size: 73px; line-height: 1.05;
              letter-spacing: 0.01em; text-transform: uppercase; }
-      .cap .w { display: inline-block; color: #fff; -webkit-text-stroke: 10px #000; paint-order: stroke fill;
+      .cap .w { display: inline-block; color: #fff; -webkit-text-stroke: 7px #000; paint-order: stroke fill;
                 text-shadow: 0 8px 0 rgba(0,0,0,0.85); margin: 0 0.14em; }
       .cap .w.on { color: var(--yellow); }
       .cap .w.key.on { color: var(--lime); transform: scale(1.12); }
 
       /* generic graphic blocks */
       .g { position: absolute; }
-      .pill { display: inline-flex; align-items: center; gap: 22px; padding: 22px 40px; border-radius: 999px; font-family: var(--font-ui);
-              font-weight: 900; font-size: 58px; color: #000; background: #fff; box-shadow: 0 14px 0 rgba(0,0,0,0.35); white-space: nowrap; }
-      .pill svg { width: 64px; height: 64px; }
+      .pill { display: inline-flex; align-items: center; gap: 22px; padding: 16px 30px; border-radius: 999px; font-family: var(--font-ui);
+              font-weight: 900; font-size: 41px; color: #000; background: #fff; box-shadow: 0 14px 0 rgba(0,0,0,0.35); white-space: nowrap; }
+      .pill svg { width: 45px; height: 45px; }
       .pill.pink { background: var(--pink); color: #fff; }
       .pill.lime { background: var(--lime); }
       .pill.yellow { background: var(--yellow); }
 
       /* hook */
       #hook { left: 0; right: 0; top: 520px; text-align: center; }
-      #hook .l1 { font-size: 150px; line-height: 0.95; -webkit-text-stroke: 12px #000; paint-order: stroke fill; text-shadow: 0 12px 0 #000; }
-      #hook .l2 { display: inline-block; margin-top: 18px; font-size: 150px; white-space: nowrap; line-height: 0.95; color: #000; background: var(--lime);
+      #hook .l1 { font-size: 105px; line-height: 0.95; -webkit-text-stroke: 8px #000; paint-order: stroke fill; text-shadow: 0 12px 0 #000; }
+      #hook .l2 { display: inline-block; margin-top: 18px; font-size: 105px; white-space: nowrap; line-height: 0.95; color: #000; background: var(--lime);
                   padding: 6px 40px 0; transform: rotate(-3deg); box-shadow: 0 16px 0 #000; }
-      #hook .l3 { margin-top: 36px; font-size: 110px; color: var(--yellow); -webkit-text-stroke: 10px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+      #hook .l3 { margin-top: 36px; font-size: 77px; color: var(--yellow); -webkit-text-stroke: 7px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
 
       /* timer ring */
-      #timer { left: 90px; top: 250px; width: 300px; height: 300px; }
+      #timer { left: 90px; top: 250px; width: 210px; height: 210px; }
       #timer svg { position: absolute; inset: 0; }
       #timer .num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-      #timer .num b { font-size: 130px; line-height: 0.9; font-weight: 400; }
-      #timer .num i { font-style: normal; font-family: var(--font-ui); font-weight: 900; font-size: 40px; color: var(--lime); }
-      #daily { left: 420px; top: 340px; }
+      #timer .num b { font-size: 91px; line-height: 0.9; font-weight: 400; }
+      #timer .num i { font-style: normal; font-family: var(--font-ui); font-weight: 900; font-size: 28px; color: var(--lime); }
+      #daily { left: 330px; top: 318px; }
 
       #easy { left: 0; right: 0; top: 330px; text-align: center; }
-      #easy span { display: inline-block; font-size: 170px; color: #000; background: var(--yellow); padding: 0 50px; transform: rotate(4deg);
+      #easy span { display: inline-block; font-size: 119px; color: #000; background: var(--yellow); padding: 0 50px; transform: rotate(4deg);
                    box-shadow: 0 16px 0 #000; }
 
       #sweat { left: 0; right: 0; top: 240px; text-align: center; }
       #sweat .watch { display: inline-flex; align-items: center; gap: 20px; }
-      #sweat .big { font-size: 140px; -webkit-text-stroke: 10px #000; paint-order: stroke fill; }
-      #sweat .tag { display: inline-block; margin-top: 20px; font-size: 120px; color: #fff; background: var(--pink); padding: 0 40px; transform: rotate(-3deg); box-shadow: 0 14px 0 #000; }
+      #sweat .big { font-size: 98px; -webkit-text-stroke: 7px #000; paint-order: stroke fill; }
+      #sweat .tag { display: inline-block; margin-top: 20px; font-size: 84px; color: #fff; background: var(--pink); padding: 0 40px; transform: rotate(-3deg); box-shadow: 0 14px 0 #000; }
       .drop { position: absolute; width: 60px; height: 84px; }
 
       #checks { left: 70px; top: 290px; display: flex; flex-direction: column; gap: 34px; align-items: flex-start; }
 
       #total { left: 0; right: 0; top: 260px; text-align: center; }
-      #total div { font-size: 200px; line-height: 0.92; -webkit-text-stroke: 12px #000; paint-order: stroke fill; text-shadow: 0 12px 0 #000; }
+      #total div { font-size: 140px; line-height: 0.92; -webkit-text-stroke: 8px #000; paint-order: stroke fill; text-shadow: 0 12px 0 #000; }
       #total .hl { display: inline-block; color: #000; background: var(--lime); -webkit-text-stroke: 0; padding: 4px 40px 0; text-shadow: none; box-shadow: 0 16px 0 #000; }
 
       #stamp { left: 0; right: 0; top: 330px; text-align: center; }
-      #stamp span { display: inline-block; font-size: 160px; color: var(--red); border: 16px solid var(--red); border-radius: 30px; padding: 6px 40px 0;
+      #stamp span { display: inline-block; font-size: 112px; color: var(--red); border: 11px solid var(--red); border-radius: 24px; padding: 6px 40px 0;
                     background: rgba(255,255,255,0.92); transform: rotate(-8deg); }
 
       #callout { left: 0; top: 0; width: 1080px; height: 1920px; }
       #callout .label { position: absolute; left: 100px; top: 300px; width: 880px; text-align: center; }
-      #callout .label .a { font-family: var(--font-ui); font-weight: 900; font-size: 46px; color: var(--lime); letter-spacing: 0.08em; }
-      #callout .label .b { font-size: 132px; line-height: 0.95; -webkit-text-stroke: 10px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+      #callout .label .a { font-family: var(--font-ui); font-weight: 900; font-size: 32px; color: var(--lime); letter-spacing: 0.08em; }
+      #callout .label .b { font-size: 92px; line-height: 0.95; -webkit-text-stroke: 7px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
 
-      #lcd { left: 140px; top: 260px; width: 800px; padding: 34px 44px; border-radius: 40px; background: rgba(12,14,18,0.92);
+      #lcd { left: 250px; top: 240px; width: 580px; padding: 24px 34px; border-radius: 40px; background: rgba(12,14,18,0.92);
              border: 6px solid var(--lime); box-shadow: 0 0 60px rgba(198,255,0,0.45), 0 18px 0 rgba(0,0,0,0.5); }
       #lcd .row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 3px dashed rgba(198,255,0,0.3); }
       #lcd .row:last-child { border-bottom: 0; }
-      #lcd .k { font-family: var(--font-ui); font-weight: 900; font-size: 48px; color: #9aa; letter-spacing: 0.06em; }
-      #lcd .v { font-size: 118px; line-height: 1; color: var(--lime); font-variant-numeric: tabular-nums; text-shadow: 0 0 24px rgba(198,255,0,0.6); }
+      #lcd .k { font-family: var(--font-ui); font-weight: 900; font-size: 34px; color: #9aa; letter-spacing: 0.06em; }
+      #lcd .v { font-size: 83px; line-height: 1; color: var(--lime); font-variant-numeric: tabular-nums; text-shadow: 0 0 24px rgba(198,255,0,0.6); }
 
+      #track { left: 70px; top: 290px; display: flex; flex-direction: column; gap: 34px; align-items: flex-start; }
       #places { left: 70px; top: 290px; display: flex; flex-direction: column; gap: 34px; align-items: flex-start; }
       #outside { left: 70px; top: 290px; }
 
       #price { left: 0; right: 0; top: 230px; text-align: center; }
       #price .tagbox { display: inline-block; position: relative; padding: 30px 70px 20px; background: var(--yellow); color: #000; border-radius: 30px;
                        box-shadow: 0 18px 0 #000; transform-origin: 50% -40px; }
-      #price .tagbox .s { font-family: var(--font-ui); font-weight: 900; font-size: 50px; letter-spacing: 0.1em; }
-      #price .tagbox .m { font-size: 190px; line-height: 0.95; }
+      #price .tagbox .s { font-family: var(--font-ui); font-weight: 900; font-size: 35px; letter-spacing: 0.1em; }
+      #price .tagbox .m { font-size: 133px; line-height: 0.95; }
       #rugi { left: 0; right: 0; top: 700px; text-align: center; }
-      #rugi span { display: inline-block; font-size: 130px; color: #fff; background: var(--red); padding: 0 40px; transform: rotate(-5deg); box-shadow: 0 14px 0 #000; }
+      #rugi span { display: inline-block; font-size: 91px; color: #fff; background: var(--red); padding: 0 40px; transform: rotate(-5deg); box-shadow: 0 14px 0 #000; }
 
       #up { left: 0; right: 0; top: 250px; text-align: center; }
       #up svg { width: 520px; height: 360px; }
-      #up .t { font-size: 140px; line-height: 0.95; color: #fff; -webkit-text-stroke: 10px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+      #up .t { font-size: 98px; line-height: 0.95; color: #fff; -webkit-text-stroke: 7px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
       #up .t b { font-weight: 400; color: var(--red); }
 
       #cta { left: 0; right: 0; top: 230px; text-align: center; }
       #cta .card { display: inline-block; padding: 40px 60px 44px; border-radius: 44px; background: #fff; color: #000; box-shadow: 0 20px 0 rgba(0,0,0,0.45); }
-      #cta .card .a { font-family: var(--font-ui); font-weight: 900; font-size: 48px; color: var(--pink); letter-spacing: 0.06em; }
-      #cta .card .b { font-size: 150px; line-height: 0.95; }
+      #cta .card .a { font-family: var(--font-ui); font-weight: 900; font-size: 34px; color: var(--pink); letter-spacing: 0.06em; }
+      #cta .card .b { font-size: 105px; line-height: 0.95; }
       #cta .bag { margin-top: 26px; display: inline-flex; align-items: center; gap: 24px; padding: 20px 46px; border-radius: 999px; background: var(--yellow);
-                  font-family: var(--font-ui); font-weight: 900; font-size: 56px; color: #000; box-shadow: 0 14px 0 #000; }
+                  font-family: var(--font-ui); font-weight: 900; font-size: 39px; color: #000; box-shadow: 0 14px 0 #000; }
       #cta .bag svg { width: 80px; height: 80px; }
       #arrows { left: 120px; top: 1430px; display: flex; flex-direction: column; align-items: center; }
       #arrows svg { width: 150px; height: 90px; margin-top: -20px; }
@@ -189,19 +190,13 @@
 
       <!-- multifunction counter callout -->
       <div id="callout" class="g clip" data-start="15.3" data-duration="2.9" data-track-index="10">
-        <svg width="1080" height="1920" style="position:absolute;inset:0">
-          <path id="cline" d="M540 640 L540 900 L660 1700" fill="none" stroke="#c6ff00" stroke-width="8" stroke-dasharray="1100" stroke-dashoffset="1100"/>
-          <circle id="cdot" cx="660" cy="1720" r="34" fill="none" stroke="#c6ff00" stroke-width="10"/>
-          <circle id="cpulse" cx="660" cy="1720" r="34" fill="none" stroke="#c6ff00" stroke-width="6"/>
-        </svg>
-        <div class="label"><div class="a">SIAP DATANG DENGAN</div><div class="b">MULTIFUNCTION<br>COUNTER</div></div>
+                <div class="label"><div class="a">SIAP DATANG DENGAN</div><div class="b">MULTIFUNCTION<br>COUNTER</div></div>
       </div>
 
       <!-- LCD counter -->
-      <div id="lcd" class="g clip" data-start="18.35" data-duration="2.75" data-track-index="10">
-        <div class="row"><span class="k">STEPS</span><span class="v" id="vsteps">0</span></div>
-        <div class="row"><span class="k">KALORI</span><span class="v" id="vkcal">0</span></div>
-        <div class="row"><span class="k">MASA</span><span class="v" id="vtime">00:00</span></div>
+      <div id="track" class="g clip" data-start="19.2" data-duration="1.9" data-track-index="10">
+        <div class="pill lime" id="tr1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>TRACK STEPS</div>
+        <div class="pill pink" id="tr2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>KALORI DIBAKAR</div>
       </div>
 
       <!-- places -->
@@ -292,18 +287,12 @@
 
       // callout
       tl.fromTo("#callout .label", { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "back.out(1.8)" }, 15.3);
-      tl.fromTo("#cline", { attr: { "stroke-dashoffset": 1100 } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.7, ease: "power2.inOut" }, 15.6);
-      tl.fromTo("#cdot", { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.3, ease: "back.out(3)" }, 16.25);
-      tl.fromTo("#cpulse", { scale: 1, opacity: 1, transformOrigin: "50% 50%" }, { scale: 2.6, opacity: 0, duration: 0.8, repeat: 1, ease: "power1.out" }, 16.45);
 
-      // LCD counter
-      tl.fromTo("#lcd", { scale: 0.3, opacity: 0, y: -100 }, { scale: 1, opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.7)" }, 18.35);
-      const ct = { s: 0, k: 0, m: 0 };
-      tl.fromTo(ct, { s: 0, k: 0, m: 0 }, { s: 1250, k: 86, m: 300, duration: 2.2, ease: "power1.inOut", onUpdate: () => {
-        document.getElementById("vsteps").textContent = Math.round(ct.s).toLocaleString("en-US");
-        document.getElementById("vkcal").textContent = Math.round(ct.k);
-        const m = Math.round(ct.m); document.getElementById("vtime").textContent = String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
-      } }, 18.7);
+
+
+      // track steps + kalori
+      tl.fromTo("#tr1", { x: -800 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 19.2);
+      tl.fromTo("#tr2", { x: -900 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 20.0);
 
       // places
       tl.fromTo("#pl1", { x: -800 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 21.25);

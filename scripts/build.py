@@ -7,22 +7,15 @@ TOTAL = 34.2
 # ---------------------------------------------------------------- edit plan
 # (output_start, output_end, source, media_start)
 CUTS = [
-    (0.00, 0.50, "f4", 7.0),    # hook montage
-    (0.50, 1.00, "f3", 2.0),
-    (1.00, 1.55, "f2", 0.5),
-    (1.55, 4.20, "f1", 1.5),    # 30 minit setiap hari
-    (4.20, 5.35, "f3", 0.0),    # nampak mudah
+    (0.00, 1.55, "f13", 2.0),   # hook: close-up kaki atas stepper
+    (1.55, 5.35, "f1", 1.5),    # 30 minit setiap hari / nampak mudah
     (5.35, 7.75, "f2", 2.0),    # 5 minit berpeluh
-    (7.75, 9.20, "f3", 3.0),    # bukan kaki je
-    (9.20, 11.55, "f4", 0.0),   # satu badan
-    (11.55, 13.85, "f4", 2.6),  # total body workout
-    (13.85, 15.05, "f2", 4.6),  # efektif gila
-    (15.05, 18.20, "f3", 11.6), # product shot: counter
-    (18.20, 21.10, "f2", 6.0),  # track steps & kalori
-    (21.10, 24.40, "f1", 4.4),  # bilik / depan TV
-    (24.40, 26.15, "f4", 5.2),  # kat luar
-    (26.15, 28.75, "f2", 9.2),  # harga murah
-    (28.75, 30.45, "f3", 5.0),  # harga naik
+    (7.75, 11.55, "f14", 1.0),  # bukan kaki je, satu badan
+    (11.55, 15.05, "f4", 0.0),  # total body workout / efektif
+    (15.05, 21.10, "f5", 50.8), # pasang bateri counter + skrin counter
+    (21.10, 24.40, "f18", 5.0), # bilik / depan TV
+    (24.40, 26.15, "f7", 2.0),  # kat luar
+    (26.15, 30.45, "f15", 2.0), # harga murah / naik
     (30.45, TOTAL, "f1", 8.0),  # CTA
 ]
 
@@ -89,19 +82,19 @@ for i, (a, b, src, ms) in enumerate(CUTS):
     vid_js.append(f'tl.fromTo("#v{i}",{{scale:1.18}},{{scale:1.04,duration:0.35,ease:"power3.out"}},{a:.2f});')
     vid_js.append(f'tl.to("#v{i}",{{scale:1.0,duration:{max(b-a-0.35,0.1):.2f},ease:"none"}},{a+0.35:.2f});')
     if i > 0:
-        vid_js.append(f'tl.fromTo("#flash",{{opacity:0.75}},{{opacity:0,duration:0.14,ease:"power1.out"}},{a:.2f});')
+        vid_js.append(f'tl.fromTo("#flash",{{opacity:0.75}},{{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false}},{a:.2f});')
 
 # ---------------------------------------------------------------- sfx
 SFX = [  # (time, file, volume)
-    (0.00, "impact", 0.55), (0.02, "whoosh", 0.35), (0.50, "whoosh", 0.35), (1.00, "whoosh", 0.35),
+    (0.00, "impact", 0.55), (0.02, "whoosh", 0.35),
     (1.55, "swoosh", 0.35), (1.70, "pop", 0.4), (2.96, "ding", 0.25),
     (4.20, "swoosh", 0.35), (4.40, "pop", 0.4),
     (5.35, "whoosh", 0.35), (5.80, "tick", 0.5), (6.78, "pop", 0.4),
-    (7.75, "swoosh", 0.35), (8.10, "pop", 0.4), (9.20, "whoosh", 0.3), (9.90, "pop", 0.4),
+    (7.75, "swoosh", 0.35), (8.10, "pop", 0.4), (9.90, "pop", 0.4),
     (11.55, "whoosh", 0.35), (12.70, "impact", 0.4),
     (13.85, "swoosh", 0.3), (14.00, "impact", 0.45),
     (15.05, "whoosh", 0.35), (15.30, "riser", 0.3), (16.75, "ding", 0.3),
-    (18.20, "swoosh", 0.35), (18.40, "pop", 0.4),
+    (18.40, "pop", 0.4), (19.20, "pop", 0.4), (20.00, "pop", 0.4),
     (21.10, "whoosh", 0.35), (21.30, "pop", 0.4), (22.50, "pop", 0.4),
     (24.40, "whoosh", 0.35), (24.70, "pop", 0.4),
     (26.15, "whoosh", 0.35), (26.30, "cash", 0.4), (27.70, "impact", 0.45),
@@ -111,7 +104,7 @@ SFX = [  # (time, file, volume)
 # counter ticks while the LCD counts up
 t = 18.75
 while t < 20.9:
-    SFX.append((round(t, 2), "tick", 0.25)); t += 0.16
+    t += 99
 DUR = {"impact": .9, "whoosh": .45, "swoosh": .35, "pop": .12, "ding": 1.2, "tick": .03,
        "riser": 1.2, "cash": 1.0, "zap": .35}
 sfx_html = []
