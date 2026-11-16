@@ -118,7 +118,7 @@ sfx_html = []
 for i, (s, f, v) in enumerate(SFX):
     d = min(DUR[f], TOTAL - s)
     sfx_html.append(f'<audio class="sfx" id="s{i}" src="assets/sfx/{f}.wav" data-start="{s:.2f}" '
-                    f'data-duration="{d:.2f}" data-volume="{round(v*0.3,3)}" data-track-index="{30 + i % 4}"></audio>')
+                    f'data-duration="{d:.2f}" data-volume="{round(v*0.15,4)}" data-track-index="{30 + i % 4}"></audio>')
 
 tpl = open(sys.argv[3]).read()
 out = (tpl.replace("{{TOTAL}}", f"{TOTAL}")
