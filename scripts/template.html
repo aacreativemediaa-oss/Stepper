@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Anton"; src: url("assets/fonts/anton-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+      @font-face { font-family: "Mont"; src: url("assets/fonts/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+      @font-face { font-family: "Mont"; src: url("assets/fonts/montserrat-latin-900-normal.woff2") format("woff2"); font-weight: 900; }
+      :root {
+        --ground: #000;
+        --ink: #ffffff;
+        --pink: #ff2e7e;
+        --lime: #c6ff00;
+        --yellow: #ffd400;
+        --red: #ff3b30;
+        --font-display: "Anton", sans-serif;
+        --font-ui: "Mont", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--font-display); color: var(--ink); }
+      .bg { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; transform-origin: 50% 45%; }
+      .layer { position: absolute; inset: 0; pointer-events: none; }
+      #vignette { background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%),
+                  linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 18%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.45) 100%); }
+      #flash { background: #fff; opacity: 0; }
+
+      /* progress bar overlay */
+      #progress { position: absolute; left: 0; top: 0; height: 12px; width: 1080px; background: linear-gradient(90deg, var(--pink), var(--lime)); transform-origin: 0 50%; transform: scaleX(0); }
+
+      /* captions */
+      .cap { position: absolute; left: 70px; right: 70px; top: 1150px; text-align: center; font-size: 104px; line-height: 1.05;
+             letter-spacing: 0.01em; text-transform: uppercase; }
+      .cap .w { display: inline-block; color: #fff; -webkit-text-stroke: 10px #000; paint-order: stroke fill;
+                text-shadow: 0 8px 0 rgba(0,0,0,0.85); margin: 0 0.14em; }
+      .cap .w.on { color: var(--yellow); }
+      .cap .w.key.on { color: var(--lime); transform: scale(1.12); }
+
+      /* generic graphic blocks */
+      .g { position: absolute; }
+      .pill { display: inline-flex; align-items: center; gap: 22px; padding: 22px 40px; border-radius: 999px; font-family: var(--font-ui);
+              font-weight: 900; font-size: 58px; color: #000; background: #fff; box-shadow: 0 14px 0 rgba(0,0,0,0.35); white-space: nowrap; }
+      .pill svg { width: 64px; height: 64px; }
+      .pill.pink { background: var(--pink); color: #fff; }
+      .pill.lime { background: var(--lime); }
+      .pill.yellow { background: var(--yellow); }
+
+      /* hook */
+      #hook { left: 0; right: 0; top: 520px; text-align: center; }
+      #hook .l1 { font-size: 150px; line-height: 0.95; -webkit-text-stroke: 12px #000; paint-order: stroke fill; text-shadow: 0 12px 0 #000; }
+      #hook .l2 { display: inline-block; margin-top: 18px; font-size: 150px; white-space: nowrap; line-height: 0.95; color: #000; background: var(--lime);
+                  padding: 6px 40px 0; transform: rotate(-3deg); box-shadow: 0 16px 0 #000; }
+      #hook .l3 { margin-top: 36px; font-size: 110px; color: var(--yellow); -webkit-text-stroke: 10px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+
+      /* timer ring */
+      #timer { left: 90px; top: 250px; width: 300px; height: 300px; }
+      #timer svg { position: absolute; inset: 0; }
+      #timer .num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      #timer .num b { font-size: 130px; line-height: 0.9; font-weight: 400; }
+      #timer .num i { font-style: normal; font-family: var(--font-ui); font-weight: 900; font-size: 40px; color: var(--lime); }
+      #daily { left: 420px; top: 340px; }
+
+      #easy { left: 0; right: 0; top: 330px; text-align: center; }
+      #easy span { display: inline-block; font-size: 170px; color: #000; background: var(--yellow); padding: 0 50px; transform: rotate(4deg);
+                   box-shadow: 0 16px 0 #000; }
+
+      #sweat { left: 0; right: 0; top: 240px; text-align: center; }
+      #sweat .watch { display: inline-flex; align-items: center; gap: 20px; }
+      #sweat .big { font-size: 140px; -webkit-text-stroke: 10px #000; paint-order: stroke fill; }
+      #sweat .tag { display: inline-block; margin-top: 20px; font-size: 120px; color: #fff; background: var(--pink); padding: 0 40px; transform: rotate(-3deg); box-shadow: 0 14px 0 #000; }
+      .drop { position: absolute; width: 60px; height: 84px; }
+
+      #checks { left: 70px; top: 290px; display: flex; flex-direction: column; gap: 34px; align-items: flex-start; }
+
+      #total { left: 0; right: 0; top: 260px; text-align: center; }
+      #total div { font-size: 200px; line-height: 0.92; -webkit-text-stroke: 12px #000; paint-order: stroke fill; text-shadow: 0 12px 0 #000; }
+      #total .hl { display: inline-block; color: #000; background: var(--lime); -webkit-text-stroke: 0; padding: 4px 40px 0; text-shadow: none; box-shadow: 0 16px 0 #000; }
+
+      #stamp { left: 0; right: 0; top: 330px; text-align: center; }
+      #stamp span { display: inline-block; font-size: 160px; color: var(--red); border: 16px solid var(--red); border-radius: 30px; padding: 6px 40px 0;
+                    background: rgba(255,255,255,0.92); transform: rotate(-8deg); }
+
+      #callout { left: 0; top: 0; width: 1080px; height: 1920px; }
+      #callout .label { position: absolute; left: 100px; top: 300px; width: 880px; text-align: center; }
+      #callout .label .a { font-family: var(--font-ui); font-weight: 900; font-size: 46px; color: var(--lime); letter-spacing: 0.08em; }
+      #callout .label .b { font-size: 132px; line-height: 0.95; -webkit-text-stroke: 10px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+
+      #lcd { left: 140px; top: 260px; width: 800px; padding: 34px 44px; border-radius: 40px; background: rgba(12,14,18,0.92);
+             border: 6px solid var(--lime); box-shadow: 0 0 60px rgba(198,255,0,0.45), 0 18px 0 rgba(0,0,0,0.5); }
+      #lcd .row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 3px dashed rgba(198,255,0,0.3); }
+      #lcd .row:last-child { border-bottom: 0; }
+      #lcd .k { font-family: var(--font-ui); font-weight: 900; font-size: 48px; color: #9aa; letter-spacing: 0.06em; }
+      #lcd .v { font-size: 118px; line-height: 1; color: var(--lime); font-variant-numeric: tabular-nums; text-shadow: 0 0 24px rgba(198,255,0,0.6); }
+
+      #places { left: 70px; top: 290px; display: flex; flex-direction: column; gap: 34px; align-items: flex-start; }
+      #outside { left: 70px; top: 290px; }
+
+      #price { left: 0; right: 0; top: 230px; text-align: center; }
+      #price .tagbox { display: inline-block; position: relative; padding: 30px 70px 20px; background: var(--yellow); color: #000; border-radius: 30px;
+                       box-shadow: 0 18px 0 #000; transform-origin: 50% -40px; }
+      #price .tagbox .s { font-family: var(--font-ui); font-weight: 900; font-size: 50px; letter-spacing: 0.1em; }
+      #price .tagbox .m { font-size: 190px; line-height: 0.95; }
+      #rugi { left: 0; right: 0; top: 700px; text-align: center; }
+      #rugi span { display: inline-block; font-size: 130px; color: #fff; background: var(--red); padding: 0 40px; transform: rotate(-5deg); box-shadow: 0 14px 0 #000; }
+
+      #up { left: 0; right: 0; top: 250px; text-align: center; }
+      #up svg { width: 520px; height: 360px; }
+      #up .t { font-size: 140px; line-height: 0.95; color: #fff; -webkit-text-stroke: 10px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+      #up .t b { font-weight: 400; color: var(--red); }
+
+      #cta { left: 0; right: 0; top: 230px; text-align: center; }
+      #cta .card { display: inline-block; padding: 40px 60px 44px; border-radius: 44px; background: #fff; color: #000; box-shadow: 0 20px 0 rgba(0,0,0,0.45); }
+      #cta .card .a { font-family: var(--font-ui); font-weight: 900; font-size: 48px; color: var(--pink); letter-spacing: 0.06em; }
+      #cta .card .b { font-size: 150px; line-height: 0.95; }
+      #cta .bag { margin-top: 26px; display: inline-flex; align-items: center; gap: 24px; padding: 20px 46px; border-radius: 999px; background: var(--yellow);
+                  font-family: var(--font-ui); font-weight: 900; font-size: 56px; color: #000; box-shadow: 0 14px 0 #000; }
+      #cta .bag svg { width: 80px; height: 80px; }
+      #arrows { left: 120px; top: 1430px; display: flex; flex-direction: column; align-items: center; }
+      #arrows svg { width: 150px; height: 90px; margin-top: -20px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="{{TOTAL}}" data-width="1080" data-height="1920">
+      <!-- footage (muted b-roll) -->
+      {{VIDEOS}}
+
+      <!-- voiceover: original audio, untouched -->
+      <audio id="vo" src="assets/vo.wav" data-start="0" data-duration="33.74" data-volume="1" data-track-index="2"></audio>
+
+      <!-- sound effects -->
+      {{SFX}}
+
+      <!-- overlays -->
+      <div id="vignette" class="layer"></div>
+
+      <!-- HOOK 0 - 1.5 -->
+      <div id="hook" class="g clip" data-start="0" data-duration="1.55" data-track-index="10">
+        <div class="l1">NAK TRIM</div>
+        <div class="l1">KELEBIHAN</div>
+        <div class="l2">SEBELUM RAYA?</div>
+      </div>
+
+      <!-- 30 minit setiap hari -->
+      <div id="timer" class="g clip" data-start="1.6" data-duration="2.6" data-track-index="10">
+        <svg viewBox="0 0 300 300"><circle cx="150" cy="150" r="130" fill="rgba(0,0,0,0.75)" stroke="rgba(255,255,255,0.2)" stroke-width="22"/>
+          <circle id="ring" cx="150" cy="150" r="130" fill="none" stroke="#ff2e7e" stroke-width="22" stroke-linecap="round"
+            stroke-dasharray="817" stroke-dashoffset="817" transform="rotate(-90 150 150)"/></svg>
+        <div class="num"><b id="tnum">30</b><i>MINIT</i></div>
+      </div>
+      <div id="daily" class="g clip" data-start="3.4" data-duration="0.8" data-track-index="11"><div class="pill lime">SETIAP HARI</div></div>
+
+      <!-- nampak mudah -->
+      <div id="easy" class="g clip" data-start="4.3" data-duration="1.05" data-track-index="10"><span>MUDAH JE?</span></div>
+
+      <!-- 5 minit berpeluh -->
+      <div id="sweat" class="g clip" data-start="5.6" data-duration="2.15" data-track-index="10">
+        <div class="watch">
+          <svg width="130" height="150" viewBox="0 0 130 150"><rect x="50" y="0" width="30" height="18" rx="4" fill="#fff"/>
+            <circle cx="65" cy="85" r="56" fill="#fff" stroke="#000" stroke-width="8"/>
+            <line id="hand" x1="65" y1="85" x2="65" y2="42" stroke="#ff2e7e" stroke-width="10" stroke-linecap="round" style="transform-origin:65px 85px"/></svg>
+          <span class="big">5 MINIT</span>
+        </div>
+        <div><span class="tag" id="sweattag">DAH BERPELUH!</span></div>
+      </div>
+      <div class="g clip" id="drops" data-start="6.7" data-duration="1.05" data-track-index="11" style="left:0;top:0;width:1080px;height:1000px">
+        <svg class="drop" style="left:160px;top:200px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg>
+        <svg class="drop" style="left:860px;top:250px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg>
+        <svg class="drop" style="left:900px;top:520px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg>
+        <svg class="drop" style="left:110px;top:560px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg>
+      </div>
+
+      <!-- kaki + satu badan -->
+      <div id="checks" class="g clip" data-start="8.0" data-duration="3.55" data-track-index="10">
+        <div class="pill" id="ck1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>KAKI</div>
+        <div class="pill pink" id="ck2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>SATU BADAN</div>
+      </div>
+
+      <!-- total body workout -->
+      <div id="total" class="g clip" data-start="12.0" data-duration="1.85" data-track-index="10">
+        <div id="tw1">TOTAL</div>
+        <div id="tw2">BODY</div>
+        <div><span class="hl" id="tw3">WORKOUT</span></div>
+      </div>
+
+      <!-- efektif gila -->
+      <div id="stamp" class="g clip" data-start="13.95" data-duration="1.1" data-track-index="10"><span>EFEKTIF GILA!</span></div>
+
+      <!-- multifunction counter callout -->
+      <div id="callout" class="g clip" data-start="15.3" data-duration="2.9" data-track-index="10">
+        <svg width="1080" height="1920" style="position:absolute;inset:0">
+          <path id="cline" d="M540 640 L540 900 L660 1700" fill="none" stroke="#c6ff00" stroke-width="8" stroke-dasharray="1100" stroke-dashoffset="1100"/>
+          <circle id="cdot" cx="660" cy="1720" r="34" fill="none" stroke="#c6ff00" stroke-width="10"/>
+          <circle id="cpulse" cx="660" cy="1720" r="34" fill="none" stroke="#c6ff00" stroke-width="6"/>
+        </svg>
+        <div class="label"><div class="a">SIAP DATANG DENGAN</div><div class="b">MULTIFUNCTION<br>COUNTER</div></div>
+      </div>
+
+      <!-- LCD counter -->
+      <div id="lcd" class="g clip" data-start="18.35" data-duration="2.75" data-track-index="10">
+        <div class="row"><span class="k">STEPS</span><span class="v" id="vsteps">0</span></div>
+        <div class="row"><span class="k">KALORI</span><span class="v" id="vkcal">0</span></div>
+        <div class="row"><span class="k">MASA</span><span class="v" id="vtime">00:00</span></div>
+      </div>
+
+      <!-- places -->
+      <div id="places" class="g clip" data-start="21.25" data-duration="3.15" data-track-index="10">
+        <div class="pill" id="pl1"><svg viewBox="0 0 64 64"><path d="M6 30 L32 8 L58 30" fill="none" stroke="#ff2e7e" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><rect x="14" y="28" width="36" height="28" fill="#ff2e7e"/><rect x="27" y="40" width="10" height="16" fill="#fff"/></svg>DALAM BILIK</div>
+        <div class="pill lime" id="pl2"><svg viewBox="0 0 64 64"><rect x="4" y="10" width="56" height="36" rx="5" fill="#000"/><rect x="10" y="16" width="44" height="24" fill="#5ad1ff"/><path d="M22 56 L42 56 M32 46 L32 56" stroke="#000" stroke-width="6" stroke-linecap="round"/></svg>DEPAN TV</div>
+      </div>
+      <div id="outside" class="g clip" data-start="24.55" data-duration="1.6" data-track-index="10">
+        <div class="pill yellow"><svg viewBox="0 0 64 64"><circle cx="46" cy="16" r="10" fill="#ff8a00"/><path d="M20 10 L6 40 L34 40 Z" fill="#1a8f3c"/><rect x="17" y="40" width="6" height="16" fill="#6b3d1f"/><rect x="2" y="56" width="60" height="6" rx="3" fill="#1a8f3c"/></svg>KAT LUAR PUN BOLEH</div>
+      </div>
+
+      <!-- price -->
+      <div id="price" class="g clip" data-start="26.3" data-duration="2.45" data-track-index="10">
+        <div class="tagbox" id="tagbox"><div class="s">HARGA TENGAH</div><div class="m">MURAH!</div></div>
+      </div>
+      <div id="rugi" class="g clip" data-start="27.7" data-duration="1.05" data-track-index="11"><span>RUGI TAK GRAB!</span></div>
+
+      <!-- price going up -->
+      <div id="up" class="g clip" data-start="28.85" data-duration="1.6" data-track-index="10">
+        <svg viewBox="0 0 520 360"><path id="upline" d="M20 320 L150 250 L240 280 L360 150 L470 60" fill="none" stroke="#ff3b30" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="620" stroke-dashoffset="620"/>
+          <path id="uphead" d="M420 40 L500 30 L490 110 Z" fill="#ff3b30" opacity="0"/></svg>
+        <div class="t">HARGA AKAN <b>NAIK!</b></div>
+      </div>
+
+      <!-- CTA -->
+      <div id="cta" class="g clip" data-start="30.6" data-duration="3.6" data-track-index="10">
+        <div class="card" id="ctacard"><div class="a">SEBELUM TERLEPAS</div><div class="b">CHECK OUT<br>SEKARANG!</div></div>
+        <div><div class="bag" id="ctabag"><svg viewBox="0 0 80 80"><path d="M14 26 H66 L62 72 H18 Z" fill="#ffd400" stroke="#000" stroke-width="6" stroke-linejoin="round"/><path d="M28 30 V20 A12 12 0 0 1 52 20 V30" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round"/></svg>BEG KUNING BAWAH NI</div></div>
+      </div>
+      <div id="arrows" class="g clip" data-start="32.6" data-duration="1.6" data-track-index="11">
+        <svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- captions -->
+      {{CAPTIONS}}
+
+      <div id="flash" class="layer"></div>
+      <div id="progress"></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      /*{{VIDJS}}*/
+
+      // progress bar overlay
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: {{TOTAL}}, ease: "none" }, 0);
+
+      // HOOK
+      tl.fromTo("#hook .l1", { scale: 2.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.22, ease: "power4.out", stagger: 0.18 }, 0.0);
+      tl.fromTo("#hook .l2", { scale: 0, rotation: -20 }, { scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }, 0.75);
+      tl.to("#hook", { scale: 1.06, duration: 0.6, ease: "none" }, 0.9);
+      tl.to("#root", { keyframes: { x: [0, -14, 12, -8, 6, 0] }, duration: 0.25 }, 0.0);
+
+      // timer
+      tl.fromTo("#timer", { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.35, ease: "back.out(2)" }, 1.6);
+      tl.fromTo("#ring", { attr: { "stroke-dashoffset": 817 } }, { attr: { "stroke-dashoffset": 0 }, duration: 1.5, ease: "power2.inOut" }, 1.85);
+      const tn = { v: 0 };
+      tl.fromTo(tn, { v: 0 }, { v: 30, duration: 1.4, ease: "power2.out", onUpdate: () => { document.getElementById("tnum").textContent = Math.round(tn.v); } }, 2.0);
+      tl.fromTo("#daily", { x: 400, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "back.out(1.8)" }, 3.4);
+
+      // mudah
+      tl.fromTo("#easy span", { scale: 0, rotation: 30 }, { scale: 1, rotation: 4, duration: 0.3, ease: "back.out(2.5)" }, 4.3);
+      tl.to("#easy span", { rotation: -4, duration: 0.25, yoyo: true, repeat: 2, ease: "sine.inOut" }, 4.6);
+
+      // 5 minit berpeluh
+      tl.fromTo("#sweat .watch", { y: -200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 5.6);
+      tl.fromTo("#hand", { rotation: 0 }, { rotation: 720, duration: 1.2, ease: "power1.inOut" }, 5.8);
+      tl.fromTo("#sweattag", { scale: 0 }, { scale: 1, duration: 0.28, ease: "back.out(3)" }, 6.78);
+      tl.fromTo("#drops .drop", { y: -120, opacity: 0, scale: 0.4 }, { y: 120, opacity: 1, scale: 1, duration: 0.9, ease: "power2.in", stagger: 0.08 }, 6.7);
+
+      // checks
+      tl.fromTo("#ck1", { x: -700 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 8.05);
+      tl.fromTo("#ck2", { x: -900 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 9.85);
+      tl.to("#ck2", { scale: 1.08, duration: 0.2, yoyo: true, repeat: 3, ease: "sine.inOut" }, 10.3);
+
+      // total body workout
+      tl.fromTo("#tw1", { x: -1100 }, { x: 0, duration: 0.25, ease: "power4.out" }, 12.0);
+      tl.fromTo("#tw2", { x: 1100 }, { x: 0, duration: 0.25, ease: "power4.out" }, 12.4);
+      tl.fromTo("#tw3", { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "power4.out" }, 12.7);
+      tl.to("#root", { keyframes: { y: [0, 12, -10, 6, 0] }, duration: 0.22 }, 12.72);
+
+      // efektif stamp
+      tl.fromTo("#stamp span", { scale: 3, opacity: 0, rotation: -25 }, { scale: 1, opacity: 1, rotation: -8, duration: 0.2, ease: "power4.in" }, 13.82);
+      tl.to("#root", { keyframes: { x: [0, 14, -12, 8, 0] }, duration: 0.22 }, 14.02);
+
+      // callout
+      tl.fromTo("#callout .label", { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "back.out(1.8)" }, 15.3);
+      tl.fromTo("#cline", { attr: { "stroke-dashoffset": 1100 } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.7, ease: "power2.inOut" }, 15.6);
+      tl.fromTo("#cdot", { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.3, ease: "back.out(3)" }, 16.25);
+      tl.fromTo("#cpulse", { scale: 1, opacity: 1, transformOrigin: "50% 50%" }, { scale: 2.6, opacity: 0, duration: 0.8, repeat: 1, ease: "power1.out" }, 16.45);
+
+      // LCD counter
+      tl.fromTo("#lcd", { scale: 0.3, opacity: 0, y: -100 }, { scale: 1, opacity: 1, y: 0, duration: 0.35, ease: "back.out(1.7)" }, 18.35);
+      const ct = { s: 0, k: 0, m: 0 };
+      tl.fromTo(ct, { s: 0, k: 0, m: 0 }, { s: 1250, k: 86, m: 300, duration: 2.2, ease: "power1.inOut", onUpdate: () => {
+        document.getElementById("vsteps").textContent = Math.round(ct.s).toLocaleString("en-US");
+        document.getElementById("vkcal").textContent = Math.round(ct.k);
+        const m = Math.round(ct.m); document.getElementById("vtime").textContent = String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+      } }, 18.7);
+
+      // places
+      tl.fromTo("#pl1", { x: -800 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 21.25);
+      tl.fromTo("#pl2", { x: -800 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 22.45);
+      tl.fromTo("#outside .pill", { scale: 0, rotation: -10 }, { scale: 1, rotation: 0, duration: 0.35, ease: "back.out(2)" }, 24.6);
+
+      // price
+      tl.fromTo("#tagbox", { y: -500, rotation: 0 }, { y: 0, duration: 0.35, ease: "power3.out" }, 26.3);
+      tl.fromTo("#tagbox", { rotation: 12 }, { rotation: 0, duration: 1.2, ease: "elastic.out(1.2,0.25)" }, 26.6);
+      tl.fromTo("#rugi span", { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.2, ease: "power4.in" }, 27.62);
+      tl.to("#root", { keyframes: { x: [0, -12, 10, -6, 0] }, duration: 0.22 }, 27.82);
+
+      // price up
+      tl.fromTo("#up .t", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 28.85);
+      tl.fromTo("#upline", { attr: { "stroke-dashoffset": 620 } }, { attr: { "stroke-dashoffset": 0 }, duration: 0.6, ease: "power2.in" }, 29.05);
+      tl.fromTo("#uphead", { opacity: 0 }, { opacity: 1, duration: 0.05 }, 29.6);
+
+      // CTA
+      tl.fromTo("#ctacard", { scale: 0, rotation: -8 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2)" }, 30.6);
+      tl.fromTo("#ctabag", { y: 300, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "back.out(2)" }, 32.75);
+      tl.to("#ctabag", { scale: 1.08, duration: 0.25, yoyo: true, repeat: 5, ease: "sine.inOut" }, 33.1);
+      tl.fromTo("#arrows svg", { y: -30, opacity: 0 }, { y: 20, opacity: 1, duration: 0.4, stagger: 0.12, repeat: 2, yoyo: true, ease: "sine.inOut" }, 32.6);
+
+      // captions
+      /*{{CAPJS}}*/
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
