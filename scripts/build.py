@@ -20,7 +20,7 @@ CUTS = [
 ]
 
 # ---------------------------------------------------------------- captions
-FIX = {"meraya": "raya", "bed": "beg"}
+FIX = {"meraya": "raya", "bed": "beg", "kelebihan": "gelebeh"}
 KEY = {"trim", "raya", "30", "minit", "mudah", "berpeluh", "gila", "kaki", "badan",
        "total", "body", "workout", "efektif", "multifunction", "counter", "steps",
        "kalori", "bilik", "tv", "luar", "murah", "rugi", "grab", "naik", "sekarang",

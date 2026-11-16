@@ -2,7 +2,7 @@
 
 | Masa | Ayat |
 |---|---|
-| 0.0–1.4s | Nak trim kelebihan sebelum raya kan? |
+| 0.0–1.4s | Nak trim gelebeh sebelum raya kan? |
 | 1.6–4.1s | Korang buat je latihan stepper ni 30 minit setiap hari. |
 | 4.2–5.2s | Nampak mudah je kan? |
 | 5.4–7.7s | Tapi 5 minit je korang buat, dah berpeluh gila tau. |
