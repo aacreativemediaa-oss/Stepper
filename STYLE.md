@@ -16,8 +16,9 @@ Style yang diluluskan untuk video stepper (Task 1). Guna semula untuk video sete
 
 ## Teks
 - Font: Anton (tajuk/caption), Montserrat 800/900 (label/pill). Saiz font = 70% daripada versi pertama.
-- **Caption/subtitle: 65px** (mulai Task 4), stroke hitam 6px.
-- **Jangan bertindih:** kalau grafik besar dah tunjuk ayat yang sama, sembunyikan caption untuk ayat tu (guna grafik sahaja). Automatik dalam `scripts/build4.py` (GFX + dup_of_graphic).
+- **Caption/subtitle: 60px** (mulai Task 5; Task 4 = 65px), stroke hitam 5px.
+- **Jangan bertindih:** kalau grafik besar dah tunjuk ayat yang sama, sembunyikan caption untuk ayat tu (guna grafik sahaja). Automatik dalam `scripts/build4.py` (GFX + dup_of_graphic). Keputusan ikut klausa penuh (dipapar semua atau disembunyi semua), sembunyi jika ≥1/3 perkataan utama ada dalam grafik — lihat `scripts/build5.py`.
+- Ilustrasi (kalendar, muscle, tapak kaki, api kalori) dilukis sendiri sebagai SVG dalam template bila tiada gambar dalam folder.
 - Caption: huruf besar, stroke hitam, perkataan aktif jadi kuning, kata kunci jadi hijau neon; 1–3 perkataan setiap paparan, di tengah (top 1150px).
 - Hook: tajuk besar 3 baris, baris akhir atas blok hijau neon condong, dengan bunyi impact + gegar.
 - Ejaan pembetulan: "gelebeh" (bukan kelebihan), "raya", "beg kuning".
