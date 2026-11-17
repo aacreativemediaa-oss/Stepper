@@ -57,9 +57,36 @@ for i, w in enumerate(words):
             chunks.append(cur)
         cur = []
 
+
+# On-screen graphics (start, end, text). A caption chunk that overlaps a graphic in time and
+# repeats >=50% of its content words is dropped, so the same sentence never shows twice.
+GFX = [
+    (3.9, 5.35, "START JE"), (6.2, 7.6, "TOTAL BODY WORKOUT"),
+    (8.2, 11.8, "KAKI SATU BADAN SERENTAK"),
+    (12.8, 16.2, "5 MINIT BERPELUH LENCUN KALORI BANYAK TERBAKAR"),
+    (16.3, 17.5, "PALING BEST"), (17.5, 19.45, "SIAP ADA MULTIFUNCTION COUNTER"),
+    (19.5, 20.85, "TRACK STEPS KALORI BURN"),
+    (21.3, 23.65, "SESUAI UNTUK BEGINNERS BERSENAM KAT RUMAH"),
+    (24.6, 26.2, "10,000 LANGKAH SEHARI"), (27.4, 28.85, "HARGA TENGAH MURAH"),
+    (28.85, 30.1, "RUGI TAK GRAB"), (30.2, 33.4, "SEBELUM STOCK HABIS CHECK OUT SEKARANG LINK KAT BAWAH NI"),
+]
+STOP = {"DAN","YANG","NAK","KORANG","JE","TAU","PUN","SO","TU","DIA","NI","SANGAT","BETTER","ATAUPUN","SEBAB","AKU","DAH","KAN","TAPI","BUAT"}
+def _norm(s): return s.upper().strip(",.?!")
+def dup_of_graphic(ch, start, end):
+    words = [_norm(w["t"]) for w in ch]
+    content = [w for w in words if w not in STOP]
+    if not content: return False
+    for gs, ge, gt in GFX:
+        if start < ge and end > gs:
+            g = set(_norm(x) for x in gt.split())
+            if sum(w in g for w in content) / len(content) >= 0.5:
+                return True
+    return False
+
 # hook (first sentence) is rendered as the big hook title instead of a caption
 HOOK_END = 3.3
 cap_html, cap_js = [], []
+prev_dropped = False
 for ci, ch in enumerate(chunks):
     if ch[-1]["e"] <= HOOK_END + 0.01:
         continue
@@ -68,6 +95,10 @@ for ci, ch in enumerate(chunks):
     end = min(max(ch[-1]["e"] + 0.15, start + 0.4), nxt_start)
     if ci + 1 == len(chunks):
         end = TOTAL - 0.05
+    content_n = len([w for w in ch if _norm(w["t"]) not in STOP])
+    if dup_of_graphic(ch, start, end) or (prev_dropped and content_n <= 1):
+        print("drop caption:", " ".join(w["t"] for w in ch)); prev_dropped = True; continue
+    prev_dropped = False
     cid = f"cap{ci}"
     spans = []
     for wi, w in enumerate(ch):
