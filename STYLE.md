@@ -11,7 +11,7 @@ Style yang diluluskan untuk video stepper (Task 1). Guna semula untuk video sete
 ## Potongan
 - Maksimum ~10 klip setiap video (~3–4 saat setiap klip). Intro: satu shot sahaja, jangan tukar laju.
 - Setiap klip: punch-in zoom 1.18→1.04 (0.35s) kemudian push perlahan ke 1.0; kilatan putih ringkas di setiap potongan (bukan di frame pertama).
-- Bunyi asal footage dimatikan.
+- Bunyi asal footage pada 30% (lihat atas), kecuali footage bermuzik dimatikan.
 - Babak produk/fitur: guna footage sebenar yang tunjuk fitur tu (cth. pasang bateri counter), bukan grafik palsu.
 
 ## Teks
