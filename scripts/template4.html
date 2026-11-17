@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Anton"; src: url("assets/fonts/anton-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+      @font-face { font-family: "Mont"; src: url("assets/fonts/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+      @font-face { font-family: "Mont"; src: url("assets/fonts/montserrat-latin-900-normal.woff2") format("woff2"); font-weight: 900; }
+      :root { --ground: #000; --ink: #fff; --pink: #ff2e7e; --lime: #c6ff00; --yellow: #ffd400; --red: #ff3b30;
+              --font-display: "Anton", sans-serif; --font-ui: "Mont", sans-serif; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--font-display); color: var(--ink); }
+      .bg { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; transform-origin: 50% 45%; }
+      .layer { position: absolute; inset: 0; pointer-events: none; }
+      #vignette { background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%),
+                  linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.45) 100%); }
+      #flash { background: #fff; opacity: 0; }
+      #progress { position: absolute; left: 0; top: 0; height: 12px; width: 1080px; background: linear-gradient(90deg, var(--pink), var(--lime)); transform-origin: 0 50%; transform: scaleX(0); }
+
+      .g { position: absolute; left: 0; right: 0; text-align: center; }
+      .big { display: block; font-size: 112px; line-height: 0.95; -webkit-text-stroke: 8px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+      .mid { display: block; font-size: 77px; line-height: 1; -webkit-text-stroke: 7px #000; paint-order: stroke fill; text-shadow: 0 8px 0 #000; }
+      .blk { display: inline-block; margin-top: 16px; font-size: 98px; line-height: 0.95; padding: 8px 34px 2px; color: #000; background: var(--lime);
+             transform: rotate(-3deg); box-shadow: 0 14px 0 #000; white-space: nowrap; }
+      .blk.pink { background: var(--pink); color: #fff; }
+      .blk.yellow { background: var(--yellow); }
+      .tagline { display: inline-block; font-family: var(--font-ui); font-weight: 900; font-size: 34px; letter-spacing: 0.1em; padding: 10px 26px;
+                 border-radius: 999px; background: #000; color: var(--lime); margin-bottom: 18px; }
+      .pill { display: inline-flex; align-items: center; gap: 16px; padding: 16px 30px; border-radius: 999px; font-family: var(--font-ui);
+              font-weight: 900; font-size: 41px; color: #000; background: #fff; box-shadow: 0 12px 0 rgba(0,0,0,0.35); white-space: nowrap; }
+      .pill svg { width: 45px; height: 45px; }
+      .pill.lime { background: var(--lime); } .pill.pink { background: var(--pink); color: #fff; } .pill.yellow { background: var(--yellow); }
+
+      #hook { top: 470px; }
+      #edu1 { top: 300px; }
+      #edu2 { top: 300px; }
+      #edu2 .strike { position: absolute; left: 50%; top: 150px; width: 0; height: 18px; margin-left: -330px; background: var(--red); transform: rotate(-4deg); border-radius: 9px; box-shadow: 0 6px 0 #000; }
+      #edu3 { top: 260px; }
+      #parts { left: 70px; right: auto; top: 640px; display: flex; flex-direction: column; gap: 24px; align-items: flex-start; }
+      #usp1 { top: 260px; }
+      #gauge { position: relative; width: 420px; height: 260px; margin: 10px auto 0; }
+      #gauge svg { position: absolute; inset: 0; }
+      #gauge .num { position: absolute; left: 0; right: 0; top: 92px; font-size: 140px; line-height: 1; -webkit-text-stroke: 8px #000; paint-order: stroke fill; color: var(--lime); }
+      #gauge .num small { font-size: 60px; color: #fff; }
+      #usp2 { top: 300px; }
+      #price { top: 260px; }
+      #price .tagbox { display: inline-block; padding: 26px 56px 18px; background: var(--yellow); color: #000; border-radius: 26px; box-shadow: 0 16px 0 #000; transform-origin: 50% -40px; }
+      #price .tagbox .s { font-family: var(--font-ui); font-weight: 900; font-size: 36px; letter-spacing: 0.1em; }
+      #price .tagbox .m { font-size: 140px; line-height: 0.95; }
+      #cta { top: 260px; }
+      #cta .card { display: inline-block; padding: 30px 50px 34px; border-radius: 36px; background: #fff; color: #000; box-shadow: 0 18px 0 rgba(0,0,0,0.45); }
+      #cta .card .a { font-family: var(--font-ui); font-weight: 900; font-size: 34px; color: var(--pink); letter-spacing: 0.06em; }
+      #cta .card .b { font-size: 120px; line-height: 0.95; }
+      #cta .bag { margin-top: 26px; display: inline-flex; align-items: center; gap: 18px; padding: 16px 36px; border-radius: 999px; background: var(--yellow);
+                  font-family: var(--font-ui); font-weight: 900; font-size: 44px; color: #000; box-shadow: 0 12px 0 #000; }
+      #cta .bag svg { width: 62px; height: 62px; }
+      #arrows { left: 120px; right: auto; top: 1430px; display: flex; flex-direction: column; align-items: center; }
+      #arrows svg { width: 150px; height: 90px; margin-top: -20px; }
+
+      /* captions (65px) */
+      .cap { position: absolute; left: 70px; right: 70px; top: 1150px; text-align: center; font-size: 65px; line-height: 1.05;
+             letter-spacing: 0.01em; text-transform: uppercase; }
+      .cap .w { display: inline-block; color: #fff; -webkit-text-stroke: 6px #000; paint-order: stroke fill;
+                text-shadow: 0 7px 0 rgba(0,0,0,0.85); margin: 0 0.22em; }
+      .cap .w.on { color: var(--yellow); }
+      .cap .w.key.on { color: var(--lime); transform: scale(1.12); }
+      .row { display: flex; gap: 20px; justify-content: center; margin-top: 26px; }
+      .stack { left: 70px; right: auto; top: 300px; display: flex; flex-direction: column; gap: 24px; align-items: flex-start; }
+      #start { top: 330px; } #start span { display: inline-block; font-size: 119px; color: #000; background: var(--yellow); padding: 0 46px; transform: rotate(4deg); box-shadow: 0 16px 0 #000; }
+      #total { top: 260px; } #total .big { font-size: 140px; }
+      #sweat { top: 240px; }
+      #sweat .watch { display: inline-flex; align-items: center; gap: 20px; }
+      .drop { position: absolute; width: 60px; height: 84px; }
+      #stamp { top: 330px; } #stamp span { display: inline-block; font-size: 112px; color: var(--red); border: 11px solid var(--red); border-radius: 24px; padding: 6px 40px 0; background: rgba(255,255,255,0.92); transform: rotate(-8deg); }
+      #callout { top: 300px; } #callout .a { font-family: var(--font-ui); font-weight: 900; font-size: 32px; color: var(--lime); letter-spacing: 0.08em; }
+      #home { top: 290px; }
+      #steps { top: 260px; } #steps .n { display: block; font-size: 190px; line-height: 1; color: var(--lime); -webkit-text-stroke: 9px #000; paint-order: stroke fill; text-shadow: 0 12px 0 #000; font-variant-numeric: tabular-nums; }
+      #rugi { top: 700px; } #rugi span { display: inline-block; font-size: 91px; color: #fff; background: var(--red); padding: 0 40px; transform: rotate(-5deg); box-shadow: 0 14px 0 #000; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="{{TOTAL}}" data-width="1080" data-height="1920">
+      {{VIDEOS}}
+
+      <!-- voiceover: original audio, untouched -->
+      <audio id="vo" src="assets/vo.wav" data-start="0" data-duration="32.76" data-volume="1" data-track-index="2"></audio>
+
+      {{SFX}}
+
+      <div id="vignette" class="layer"></div>
+
+      <!-- HOOK 0-3.4 -->
+      <div id="hook" class="g clip" data-start="0" data-duration="3.4" data-track-index="10" style="top:400px">
+        <span class="big" id="h1">AZAM 2027</span>
+        <span class="blk" id="h2">NAK FIT?</span>
+        <div style="margin-top:34px"><span class="blk pink" id="h3" style="font-size:70px">KECILKAN GELEBEH</span></div>
+        <div class="row"><span class="pill yellow" id="h4">LENGAN</span><span class="pill yellow" id="h5">PEHA</span></div>
+      </div>
+
+      <div id="start" class="g clip" data-start="3.9" data-duration="1.45" data-track-index="10"><span>START JE!</span></div>
+
+      <div id="total" class="g clip" data-start="6.2" data-duration="1.4" data-track-index="10">
+        <span class="big" id="tw1">TOTAL</span><span class="big" id="tw2">BODY</span><span class="blk" id="tw3">WORKOUT</span>
+      </div>
+
+      <div id="checks" class="g clip stack" data-start="8.2" data-duration="3.6" data-track-index="10">
+        <div class="pill" id="ck1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>KAKI</div>
+        <div class="pill lime" id="ck2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>SATU BADAN</div>
+        <div class="pill pink" id="ck3"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>SERENTAK!</div>
+      </div>
+
+      <div id="sweat" class="g clip" data-start="12.8" data-duration="3.4" data-track-index="10">
+        <div class="watch">
+          <svg width="110" height="128" viewBox="0 0 130 150"><rect x="50" y="0" width="30" height="18" rx="4" fill="#fff"/><circle cx="65" cy="85" r="56" fill="#fff" stroke="#000" stroke-width="8"/>
+            <line id="hand" x1="65" y1="85" x2="65" y2="42" stroke="#ff2e7e" stroke-width="10" stroke-linecap="round" style="transform-origin:65px 85px"/></svg>
+          <span class="big">5 MINIT</span>
+        </div>
+        <div><span class="blk pink" id="sweattag">BERPELUH LENCUN!</span></div>
+        <div style="margin-top:28px"><span class="pill yellow" id="kal">KALORI BANYAK TERBAKAR</span></div>
+      </div>
+      <div class="g clip" id="drops" data-start="13.4" data-duration="1.3" data-track-index="11" style="left:0;top:0;width:1080px;height:1000px">
+        <svg class="drop" style="left:150px;top:200px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg><svg class="drop" style="left:870px;top:240px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg><svg class="drop" style="left:910px;top:520px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg><svg class="drop" style="left:110px;top:560px" viewBox="0 0 60 84"><path d="M30 0 C30 0 0 40 0 56 A30 28 0 0 0 60 56 C60 40 30 0 30 0Z" fill="#5ad1ff" stroke="#000" stroke-width="5"/></svg>
+      </div>
+
+      <div id="stamp" class="g clip" data-start="16.3" data-duration="1.2" data-track-index="10"><span>PALING BEST!</span></div>
+      <div id="callout" class="g clip" data-start="17.5" data-duration="1.95" data-track-index="10">
+        <div class="a" id="ca">SIAP ADA</div><span class="big" id="cb" style="font-size:92px">MULTIFUNCTION<br>COUNTER</span>
+      </div>
+      <div id="track" class="g clip stack" data-start="19.5" data-duration="1.35" data-track-index="10">
+        <div class="pill lime" id="tr1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>TRACK STEPS</div>
+        <div class="pill pink" id="tr2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>KALORI BURN</div>
+      </div>
+
+      <div id="home" class="g clip" data-start="21.3" data-duration="2.35" data-track-index="10">
+        <div><span class="pill yellow" id="hm1"><svg viewBox="0 0 64 64"><path d="M6 30 L32 8 L58 30" fill="none" stroke="#ff2e7e" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><rect x="14" y="28" width="36" height="28" fill="#ff2e7e"/><rect x="27" y="40" width="10" height="16" fill="#fff"/></svg>SESUAI UNTUK BEGINNERS</span></div>
+        <span class="blk" id="hm2" style="margin-top:26px">BERSENAM KAT RUMAH</span>
+      </div>
+
+      <div id="steps" class="g clip" data-start="24.6" data-duration="1.6" data-track-index="10">
+        <span class="n" id="stepn">0</span><span class="blk pink" id="stepl" style="font-size:70px">LANGKAH SEHARI</span>
+      </div>
+
+      <div id="price" class="g clip" data-start="27.4" data-duration="1.45" data-track-index="10">
+        <div class="tagbox" id="tagbox"><div class="s">HARGA TENGAH</div><div class="m">MURAH!</div></div>
+      </div>
+      <div id="rugi" class="g clip" data-start="28.85" data-duration="1.25" data-track-index="11"><span>RUGI TAK GRAB!</span></div>
+
+      <div id="cta" class="g clip" data-start="30.2" data-duration="3.2" data-track-index="10">
+        <div class="card" id="ctacard"><div class="a">SEBELUM STOCK HABIS</div><div class="b">CHECK OUT<br>SEKARANG!</div></div>
+        <div><div class="bag" id="ctabag"><svg viewBox="0 0 80 80"><path d="M14 26 H66 L62 72 H18 Z" fill="#ffd400" stroke="#000" stroke-width="6" stroke-linejoin="round"/><path d="M28 30 V20 A12 12 0 0 1 52 20 V30" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round"/></svg>LINK KAT BAWAH NI</div></div>
+      </div>
+      <div id="arrows" class="g clip" data-start="31.6" data-duration="1.8" data-track-index="11"><svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      {{CAPTIONS}}
+
+      <div id="flash" class="layer"></div>
+      <div id="progress"></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      /*{{VIDJS}}*/
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: {{TOTAL}}, ease: "none" }, 0);
+
+      // hook
+      tl.fromTo("#h1", { scale: 2.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "power4.out" }, 0.05);
+      tl.fromTo("#h2", { scale: 0, rotation: -20 }, { scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }, 0.7);
+      tl.fromTo("#h3", { x: -1100 }, { x: 0, duration: 0.3, ease: "power4.out" }, 1.55);
+      tl.fromTo("#h4", { scale: 0 }, { scale: 1, duration: 0.25, ease: "back.out(3)" }, 2.3);
+      tl.fromTo("#h5", { scale: 0 }, { scale: 1, duration: 0.25, ease: "back.out(3)" }, 2.7);
+      tl.to("#root", { keyframes: { x: [0, -14, 12, -8, 6, 0] }, duration: 0.25 }, 0.05);
+      tl.to("#root", { keyframes: { y: [0, 12, -10, 6, 0] }, duration: 0.22 }, 0.75);
+
+      tl.fromTo("#start span", { scale: 0, rotation: 30 }, { scale: 1, rotation: 4, duration: 0.3, ease: "back.out(2.5)" }, 3.9);
+      tl.fromTo("#tw1", { x: -1100 }, { x: 0, duration: 0.22, ease: "power4.out" }, 6.2);
+      tl.fromTo("#tw2", { x: 1100 }, { x: 0, duration: 0.22, ease: "power4.out" }, 6.42);
+      tl.fromTo("#tw3", { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.22, ease: "power4.out" }, 6.68);
+      tl.to("#root", { keyframes: { y: [0, 12, -10, 6, 0] }, duration: 0.22 }, 6.9);
+
+      tl.fromTo("#ck1", { x: -700 }, { x: 0, duration: 0.3, ease: "back.out(1.6)" }, 8.25);
+      tl.fromTo("#ck2", { x: -800 }, { x: 0, duration: 0.3, ease: "back.out(1.6)" }, 9.95);
+      tl.fromTo("#ck3", { x: -800 }, { x: 0, duration: 0.3, ease: "back.out(1.6)" }, 11.1);
+
+      tl.fromTo("#sweat .watch", { y: -200, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 12.85);
+      tl.fromTo("#hand", { rotation: 0 }, { rotation: 720, duration: 1.2, ease: "power1.inOut" }, 13.0);
+      tl.fromTo("#sweattag", { scale: 0 }, { scale: 1, duration: 0.28, ease: "back.out(3)" }, 13.8);
+      tl.fromTo("#drops .drop", { y: -120, opacity: 0, scale: 0.4 }, { y: 120, opacity: 1, scale: 1, duration: 1.0, ease: "power2.in", stagger: 0.08 }, 13.45);
+      tl.fromTo("#kal", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 14.65);
+
+      tl.fromTo("#stamp span", { scale: 3, opacity: 0, rotation: -25 }, { scale: 1, opacity: 1, rotation: -8, duration: 0.2, ease: "power4.in" }, 16.4);
+      tl.to("#root", { keyframes: { x: [0, 14, -12, 8, 0] }, duration: 0.22 }, 16.6);
+      tl.fromTo("#ca", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25 }, 17.45);
+      tl.fromTo("#cb", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(1.8)" }, 17.7);
+      tl.fromTo("#tr1", { x: -800 }, { x: 0, duration: 0.3, ease: "back.out(1.6)" }, 19.7);
+      tl.fromTo("#tr2", { x: -900 }, { x: 0, duration: 0.3, ease: "back.out(1.6)" }, 20.2);
+
+      tl.fromTo("#hm1", { scale: 0, rotation: -10 }, { scale: 1, rotation: 0, duration: 0.35, ease: "back.out(2)" }, 21.35);
+      tl.fromTo("#hm2", { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "power4.out" }, 22.75);
+
+      tl.fromTo("#steps", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.8)" }, 24.6);
+      const st = { v: 0 };
+      tl.fromTo(st, { v: 0 }, { v: 10000, duration: 0.9, ease: "power2.out", onUpdate: () => { document.getElementById("stepn").textContent = Math.round(st.v).toLocaleString("en-US"); } }, 24.75);
+      tl.fromTo("#stepl", { scale: 0 }, { scale: 1, duration: 0.25, ease: "back.out(3)" }, 25.35);
+
+      tl.fromTo("#tagbox", { y: -500 }, { y: 0, duration: 0.35, ease: "power3.out" }, 27.4);
+      tl.fromTo("#tagbox", { rotation: 12 }, { rotation: 0, duration: 1.1, ease: "elastic.out(1.2,0.25)", immediateRender: false }, 27.7);
+      tl.fromTo("#rugi span", { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.2, ease: "power4.in" }, 28.8);
+      tl.to("#root", { keyframes: { x: [0, -12, 10, -6, 0] }, duration: 0.22 }, 29.0);
+
+      tl.fromTo("#ctacard", { scale: 0, rotation: -8 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2)" }, 30.25);
+      tl.fromTo("#ctabag", { y: 300, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "back.out(2)" }, 31.5);
+      tl.to("#ctabag", { scale: 1.08, duration: 0.25, yoyo: true, repeat: 5, ease: "sine.inOut" }, 31.9);
+      tl.fromTo("#arrows svg", { y: -30, opacity: 0 }, { y: 20, opacity: 1, duration: 0.4, stagger: 0.12, repeat: 3, yoyo: true, ease: "sine.inOut" }, 31.6);
+
+      /*{{CAPJS}}*/
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

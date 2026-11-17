@@ -5,6 +5,8 @@ Style yang diluluskan untuk video stepper (Task 1). Guna semula untuk video sete
 ## Format
 - 1080×1920 menegak, 60fps, Hyperframes (`hyperframes/`), render `--quality delivery`.
 - Tiada muzik latar. Voiceover asal **tidak diubah** (volume 1, tiada potongan).
+- Bunyi asal footage: 30%. Footage yang bunyinya ada muzik (lv_0_20250521120347, video_20260531_203850) dimatikan/dielakkan.
+- Sebelum render akhir: tunjuk draf caption kepada pengguna untuk disemak.
 
 ## Potongan
 - Maksimum ~10 klip setiap video (~3–4 saat setiap klip). Intro: satu shot sahaja, jangan tukar laju.
@@ -13,7 +15,8 @@ Style yang diluluskan untuk video stepper (Task 1). Guna semula untuk video sete
 - Babak produk/fitur: guna footage sebenar yang tunjuk fitur tu (cth. pasang bateri counter), bukan grafik palsu.
 
 ## Teks
-- Font: Anton (tajuk/caption), Montserrat 800/900 (label/pill). Saiz font = 70% daripada versi pertama (caption 73px).
+- Font: Anton (tajuk/caption), Montserrat 800/900 (label/pill). Saiz font = 70% daripada versi pertama.
+- **Caption/subtitle: 65px** (mulai Task 4), stroke hitam 6px.
 - Caption: huruf besar, stroke hitam, perkataan aktif jadi kuning, kata kunci jadi hijau neon; 1–3 perkataan setiap paparan, di tengah (top 1150px).
 - Hook: tajuk besar 3 baris, baris akhir atas blok hijau neon condong, dengan bunyi impact + gegar.
 - Ejaan pembetulan: "gelebeh" (bukan kelebihan), "raya", "beg kuning".
