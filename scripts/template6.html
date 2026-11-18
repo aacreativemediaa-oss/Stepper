@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Anton"; src: url("assets/fonts/anton-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+      @font-face { font-family: "Mont"; src: url("assets/fonts/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+      @font-face { font-family: "Mont"; src: url("assets/fonts/montserrat-latin-900-normal.woff2") format("woff2"); font-weight: 900; }
+      :root { --ground: #000; --ink: #fff; --pink: #ff2e7e; --lime: #c6ff00; --yellow: #ffd400; --red: #ff3b30;
+              --font-display: "Anton", sans-serif; --font-ui: "Mont", sans-serif; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--font-display); color: var(--ink); }
+      .bg { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; transform-origin: 50% 45%; }
+      .layer { position: absolute; inset: 0; pointer-events: none; }
+      #vignette { background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%),
+                  linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.45) 100%); }
+      #flash { background: #fff; opacity: 0; }
+      #progress { position: absolute; left: 0; top: 0; height: 12px; width: 1080px; background: linear-gradient(90deg, var(--pink), var(--lime)); transform-origin: 0 50%; transform: scaleX(0); }
+
+      .g { position: absolute; left: 0; right: 0; text-align: center; }
+      .big { display: block; font-size: 112px; line-height: 0.95; -webkit-text-stroke: 8px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+      .mid { display: block; font-size: 77px; line-height: 1; -webkit-text-stroke: 7px #000; paint-order: stroke fill; text-shadow: 0 8px 0 #000; }
+      .blk { display: inline-block; margin-top: 16px; font-size: 98px; line-height: 0.95; padding: 8px 34px 2px; color: #000; background: var(--lime);
+             transform: rotate(-3deg); box-shadow: 0 14px 0 #000; white-space: nowrap; }
+      .blk.pink { background: var(--pink); color: #fff; }
+      .blk.yellow { background: var(--yellow); }
+      .tagline { display: inline-block; font-family: var(--font-ui); font-weight: 900; font-size: 34px; letter-spacing: 0.1em; padding: 10px 26px;
+                 border-radius: 999px; background: #000; color: var(--lime); margin-bottom: 18px; }
+      .pill { display: inline-flex; align-items: center; gap: 16px; padding: 16px 30px; border-radius: 999px; font-family: var(--font-ui);
+              font-weight: 900; font-size: 41px; color: #000; background: #fff; box-shadow: 0 12px 0 rgba(0,0,0,0.35); white-space: nowrap; }
+      .pill svg { width: 45px; height: 45px; }
+      .pill.lime { background: var(--lime); } .pill.pink { background: var(--pink); color: #fff; } .pill.yellow { background: var(--yellow); }
+
+      #hook { top: 470px; }
+      #edu1 { top: 300px; }
+      #edu2 { top: 300px; }
+      #edu2 .strike { position: absolute; left: 50%; top: 150px; width: 0; height: 18px; margin-left: -330px; background: var(--red); transform: rotate(-4deg); border-radius: 9px; box-shadow: 0 6px 0 #000; }
+      #edu3 { top: 260px; }
+      #parts { left: 70px; right: auto; top: 640px; display: flex; flex-direction: column; gap: 24px; align-items: flex-start; }
+      #usp1 { top: 260px; }
+      #gauge { position: relative; width: 420px; height: 260px; margin: 10px auto 0; }
+      #gauge svg { position: absolute; inset: 0; }
+      #gauge .num { position: absolute; left: 0; right: 0; top: 92px; font-size: 140px; line-height: 1; -webkit-text-stroke: 8px #000; paint-order: stroke fill; color: var(--lime); }
+      #gauge .num small { font-size: 60px; color: #fff; }
+      #usp2 { top: 300px; }
+      #price { top: 260px; }
+      #price .tagbox { display: inline-block; padding: 26px 56px 18px; background: var(--yellow); color: #000; border-radius: 26px; box-shadow: 0 16px 0 #000; transform-origin: 50% -40px; }
+      #price .tagbox .s { font-family: var(--font-ui); font-weight: 900; font-size: 36px; letter-spacing: 0.1em; }
+      #price .tagbox .m { font-size: 140px; line-height: 0.95; }
+      #cta { top: 260px; }
+      #cta .card { display: inline-block; padding: 30px 50px 34px; border-radius: 36px; background: #fff; color: #000; box-shadow: 0 18px 0 rgba(0,0,0,0.45); }
+      #cta .card .a { font-family: var(--font-ui); font-weight: 900; font-size: 34px; color: var(--pink); letter-spacing: 0.06em; }
+      #cta .card .b { font-size: 120px; line-height: 0.95; }
+      #cta .bag { margin-top: 26px; display: inline-flex; align-items: center; gap: 18px; padding: 16px 36px; border-radius: 999px; background: var(--yellow);
+                  font-family: var(--font-ui); font-weight: 900; font-size: 44px; color: #000; box-shadow: 0 12px 0 #000; }
+      #cta .bag svg { width: 62px; height: 62px; }
+      #arrows { left: 120px; right: auto; top: 1430px; display: flex; flex-direction: column; align-items: center; }
+      #arrows svg { width: 150px; height: 90px; margin-top: -20px; }
+
+      .row { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 24px; padding: 0 60px; }
+      .num { display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 150px; border-radius: 50%; background: var(--pink);
+             border: 8px solid #000; box-shadow: 0 12px 0 #000; font-size: 100px; color: #fff; -webkit-text-stroke: 6px #000; paint-order: stroke fill; margin-bottom: 14px; }
+      .cara { font-family: var(--font-ui); font-weight: 900; font-size: 34px; letter-spacing: 0.12em; color: var(--lime); }
+      #muscle { width: 220px; height: 190px; display: block; margin: 0 auto 6px; }
+      .icon { width: 190px; height: 170px; display: block; margin: 0 auto 6px; }
+      .stat { display: inline-flex; gap: 26px; align-items: stretch; margin-top: 22px; }
+      .stat .box { background: rgba(0,0,0,0.78); border: 5px solid var(--lime); border-radius: 26px; padding: 14px 30px 10px; min-width: 250px; }
+      .stat .box b { display: block; font-weight: 400; font-size: 110px; line-height: 1; color: var(--lime); font-variant-numeric: tabular-nums; }
+      .stat .box i { font-style: normal; font-family: var(--font-ui); font-weight: 900; font-size: 30px; letter-spacing: 0.1em; color: #fff; }
+      .stat .eq { align-self: center; font-size: 90px; color: #fff; -webkit-text-stroke: 6px #000; paint-order: stroke fill; }
+      #bm { width: 120px; height: 150px; display: block; margin: 0 auto 10px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="{{TOTAL}}" data-width="1080" data-height="1920">
+      {{VIDEOS}}
+      {{SFX}}
+      <div id="vignette" class="layer"></div>
+
+      <!-- HOOK -->
+      <div id="hook" class="g clip" data-start="0" data-duration="3.5" data-track-index="10" style="top:330px">
+        <span class="big" id="h1" style="font-size:240px;color:var(--lime)">3 CARA</span>
+        <span class="mid" id="h2" style="margin-top:6px">V-STEPPER</span>
+        <span class="blk pink" id="h3">KECILKAN GELEBEH</span>
+      </div>
+
+      <!-- MINI HOOK -->
+      <div id="mini" class="g clip" data-start="3.55" data-duration="1.95" data-track-index="10" style="top:420px">
+        <svg id="bm" viewBox="0 0 120 150"><path d="M15 10 H105 V140 L60 105 L15 140 Z" fill="#ffd400" stroke="#000" stroke-width="9" stroke-linejoin="round"/><path d="M40 55 L55 70 L82 42" fill="none" stroke="#000" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="blk yellow" id="m1">SAVE VIDEO NI</span>
+        <span class="mid" id="m2" style="margin-top:18px">SEBELUM HILANG!</span>
+      </div>
+
+      <!-- EDU 1 -->
+      <div id="e1" class="g clip" data-start="5.55" data-duration="4.95" data-track-index="10" style="top:230px">
+        <div class="num" id="e1n">1</div>
+        <span class="blk" id="e1t">BAKAR KALORI CEPAT</span>
+        <div class="stat" id="e1s">
+          <div class="box"><b id="min">0</b><i>MINIT</i></div><div class="eq">=</div><div class="box" style="border-color:var(--yellow)"><b id="kcal" style="color:var(--yellow)">0</b><i>KALORI</i></div>
+        </div>
+      </div>
+      <div id="e1f" class="g clip" data-start="6.6" data-duration="3.9" data-track-index="11" style="top:690px"><svg class="icon" viewBox="0 0 190 170"><path d="M95 165 C45 165 25 130 30 100 C35 70 60 55 62 25 C85 40 95 60 92 80 C105 70 110 55 108 40 C140 65 165 95 160 125 C155 150 130 165 95 165 Z" fill="#ff3b30" stroke="#000" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M95 160 C70 160 60 140 65 122 C70 105 85 98 88 80 C105 95 118 110 120 128 C122 148 112 160 95 160 Z" fill="#ffd400" stroke="#000" stroke-width="5" stroke-linejoin="round"/></svg></div>
+
+      <!-- EDU 2 -->
+      <div id="e2" class="g clip" data-start="10.55" data-duration="5.95" data-track-index="10" style="top:230px">
+        <div class="num" id="e2n">2</div>
+        <span class="blk" id="e2t">TOTAL BODY WORKOUT</span>
+        <div style="margin-top:22px"><svg id="muscle" viewBox="0 0 300 260">
+  <g stroke="#000" stroke-width="9" stroke-linejoin="round" fill="#ffb07c">
+    <path d="M182 215 L170 85 Q168 60 205 60 Q240 60 240 85 L248 215 Z"/>
+    <rect x="158" y="8" width="100" height="78" rx="34"/>
+    <ellipse cx="112" cy="172" rx="78" ry="58"/>
+    <path d="M18 175 L205 175 Q248 175 248 212 Q248 250 205 250 L18 250 Z"/>
+  </g>
+  <rect x="24" y="180" width="170" height="20" fill="#ffb07c"/>
+  <g stroke="#000" stroke-width="6" stroke-linecap="round" fill="none"><path d="M180 40 L200 40"/><path d="M180 58 L205 58"/></g>
+  <path d="M70 140 Q105 116 145 128" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity="0.8"/>
+  <g stroke="#c6ff00" stroke-width="10" stroke-linecap="round"><path d="M40 92 L58 112"/><path d="M95 70 L98 96"/><path d="M150 82 L140 104"/><path d="M272 120 L292 110"/></g>
+</svg></div>
+        <div class="row">
+          <span class="pill lime" id="o1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>PUNGGUNG</span>
+          <span class="pill lime" id="o2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>PEHA</span>
+          <span class="pill lime" id="o3"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>BETIS</span>
+          <span class="pill pink" id="o4"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>LENGAN</span>
+          <span class="pill pink" id="o5"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>CORE</span>
+        </div>
+      </div>
+
+      <!-- EDU 3 -->
+      <div id="e3" class="g clip" data-start="16.55" data-duration="4.45" data-track-index="10" style="top:230px">
+        <div class="num" id="e3n">3</div>
+        <span class="blk" id="e3t">LOW INTENSITY</span>
+        <div style="margin-top:30px"><span class="pill yellow" id="e3a"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#ffd400" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>BOLEH BERLATIH SETIAP HARI</span></div>
+        <div style="margin-top:20px"><span class="pill" id="e3b"><svg viewBox="0 0 64 64"><path d="M6 30 L32 8 L58 30" fill="none" stroke="#ff2e7e" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><rect x="14" y="28" width="36" height="28" fill="#ff2e7e"/><rect x="27" y="40" width="10" height="16" fill="#fff"/></svg>DALAM RUMAH JE</span></div>
+      </div>
+
+      <!-- USP 1 -->
+      <div id="u1" class="g clip" data-start="21.05" data-duration="3.95" data-track-index="10" style="top:260px">
+        <div class="cara" id="u1c">RINGAN GILA</div>
+        <svg class="icon" id="kb" viewBox="0 0 190 170"><path d="M60 62 C55 20 135 20 130 62" fill="none" stroke="#000" stroke-width="22" stroke-linecap="round"/><path d="M60 62 C55 20 135 20 130 62" fill="none" stroke="#c6ff00" stroke-width="10" stroke-linecap="round"/><path d="M95 165 C45 165 28 135 32 105 C36 75 60 58 95 58 C130 58 154 75 158 105 C162 135 145 165 95 165 Z" fill="#c6ff00" stroke="#000" stroke-width="8"/><text x="95" y="132" text-anchor="middle" font-family="Anton" font-size="52" fill="#000">&lt;6KG</text></svg>
+        <span class="mid" id="u1a">BERAT TAK SAMPAI 6KG</span>
+        <span class="blk pink" id="u1b" style="font-size:72px">SENANG ALIH KE MANA-MANA</span>
+      </div>
+
+      <!-- USP 2 -->
+      <div id="u2" class="g clip" data-start="25.05" data-duration="3.45" data-track-index="10" style="top:240px">
+        <div class="cara" id="u2c">SIAP DATANG DENGAN</div>
+        <span class="big" id="u2a" style="font-size:98px">MULTIFUNCTION<br>COUNTER</span>
+      </div>
+
+      <!-- CTA 1 -->
+      <div id="c1" class="g clip" data-start="28.55" data-duration="2.95" data-track-index="10" style="top:330px">
+        <span class="mid" id="c1a">NAK TRIM GELEBEH</span>
+        <span class="blk" id="c1b">SEBELUM RAYA?</span>
+      </div>
+
+      <!-- CTA 2 -->
+      <div id="cta" class="g clip" data-start="31.55" data-duration="3.45" data-track-index="10">
+        <div class="card" id="ctacard"><div class="a">JOM!</div><div class="b">START WORKOUT<br>SEKARANG!</div></div>
+      </div>
+      <div id="arrows" class="g clip" data-start="32.3" data-duration="2.7" data-track-index="11"><svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg><svg viewBox="0 0 150 90"><path d="M15 15 L75 75 L135 15" fill="none" stroke="#ffd400" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <div id="flash" class="layer"></div>
+      <div id="progress"></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      /*{{VIDJS}}*/
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: {{TOTAL}}, ease: "none" }, 0);
+      const set = (id, v) => { document.getElementById(id).textContent = v; };
+
+      // hook
+      tl.fromTo("#h1", { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.28, ease: "power4.out" }, 0.05);
+      tl.to("#root", { keyframes: { x: [0, -14, 12, -8, 6, 0] }, duration: 0.25 }, 0.3);
+      tl.fromTo("#h2", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: "power2.out" }, 0.75);
+      tl.fromTo("#h3", { scale: 0, rotation: -20 }, { scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }, 1.2);
+      tl.to("#h1", { scale: 1.06, duration: 0.3, yoyo: true, repeat: 3, ease: "sine.inOut" }, 1.7);
+
+      // mini hook
+      tl.fromTo("#bm", { y: -300, rotation: -20 }, { y: 0, rotation: 0, duration: 0.4, ease: "back.out(2)" }, 3.6);
+      tl.fromTo("#m1", { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.5)" }, 3.85);
+      tl.fromTo("#m2", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25 }, 4.2);
+      tl.to("#bm", { scale: 1.15, duration: 0.2, yoyo: true, repeat: 3, ease: "sine.inOut" }, 4.5);
+
+      // edu 1
+      tl.fromTo("#e1n", { scale: 0, rotation: -180 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2)" }, 5.6);
+      tl.fromTo("#e1t", { x: -1100 }, { x: 0, duration: 0.3, ease: "power4.out" }, 5.95);
+      tl.fromTo("#e1s", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 6.5);
+      const k1 = { m: 0, c: 0 };
+      tl.fromTo(k1, { m: 0, c: 0 }, { m: 10, c: 100, duration: 1.8, ease: "power1.inOut", onUpdate: () => { set("min", Math.round(k1.m)); set("kcal", Math.round(k1.c)); } }, 6.7);
+      tl.fromTo("#e1f .icon", { scale: 0, transformOrigin: "50% 100%" }, { scale: 1, duration: 0.35, ease: "back.out(2)" }, 6.65);
+      tl.to("#e1f .icon", { scaleY: 1.12, duration: 0.18, yoyo: true, repeat: 9, ease: "sine.inOut", transformOrigin: "50% 100%" }, 7.0);
+      tl.to("#e1s", { scale: 1.08, duration: 0.15, yoyo: true, repeat: 1 }, 8.5);
+
+      // edu 2
+      tl.fromTo("#e2n", { scale: 0, rotation: -180 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2)" }, 10.6);
+      tl.fromTo("#e2t", { x: 1100 }, { x: 0, duration: 0.3, ease: "power4.out" }, 10.95);
+      tl.fromTo("#muscle", { scale: 0, rotation: -25 }, { scale: 1, rotation: 0, duration: 0.35, ease: "back.out(2.2)" }, 11.3);
+      tl.to("#muscle", { scale: 1.1, duration: 0.18, yoyo: true, repeat: 3, ease: "sine.inOut" }, 11.7);
+      tl.fromTo(["#o1","#o2","#o3","#o4","#o5"], { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.5)", stagger: 0.55 }, 12.4);
+
+      // edu 3
+      tl.fromTo("#e3n", { scale: 0, rotation: -180 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2)" }, 16.6);
+      tl.fromTo("#e3t", { x: -1100 }, { x: 0, duration: 0.3, ease: "power4.out" }, 16.95);
+      tl.fromTo("#e3a", { x: -1100 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 17.6);
+      tl.fromTo("#e3b", { x: 1100 }, { x: 0, duration: 0.35, ease: "back.out(1.6)" }, 18.4);
+
+      // usp 1
+      tl.fromTo("#u1c", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25 }, 21.1);
+      tl.fromTo("#kb", { y: -500 }, { y: 0, duration: 0.45, ease: "bounce.out" }, 21.2);
+      tl.fromTo("#u1a", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 21.8);
+      tl.fromTo("#u1b", { x: 1100 }, { x: 0, duration: 0.3, ease: "power4.out" }, 22.6);
+      tl.to("#kb", { x: 30, rotation: 8, duration: 0.3, yoyo: true, repeat: 3, ease: "sine.inOut" }, 22.9);
+
+      // usp 2
+      tl.fromTo("#u2c", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25 }, 25.1);
+      tl.fromTo("#u2a", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(1.8)" }, 25.35);
+
+      // cta
+      tl.fromTo("#c1a", { y: -60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25 }, 28.6);
+      tl.fromTo("#c1b", { scale: 0, rotation: 15 }, { scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }, 29.0);
+      tl.fromTo("#ctacard", { scale: 0, rotation: -8 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2)" }, 31.6);
+      tl.to("#ctacard", { scale: 1.06, duration: 0.25, yoyo: true, repeat: 5, ease: "sine.inOut" }, 32.2);
+      tl.fromTo("#arrows svg", { y: -30, opacity: 0 }, { y: 20, opacity: 1, duration: 0.4, stagger: 0.12, repeat: 4, yoyo: true, ease: "sine.inOut" }, 32.3);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
