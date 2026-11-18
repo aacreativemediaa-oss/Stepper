@@ -9,7 +9,7 @@ Tiada voiceover. Footage tiada percakapan (lihat TRANSKRIP_TASK3.md); bunyi asal
 | 5.5–10.5s | Cara 1 | BAKAR KALORI CEPAT / 10 MINIT = 100 KALORI (+ ikon api) |
 | 10.5–16.5s | Cara 2 | TOTAL BODY WORKOUT (+ ikon muscle) / ✓PUNGGUNG ✓PEHA ✓BETIS ✓LENGAN ✓CORE |
 | 16.5–21.0s | Cara 3 | LOW INTENSITY / BOLEH BERLATIH SETIAP HARI / DALAM RUMAH JE |
-| 21.0–25.0s | USP | RINGAN GILA (+ kettlebell <6KG) / BERAT TAK SAMPAI 6KG / SENANG ALIH KE MANA-MANA |
+| 21.0–25.0s | USP | Footage timbang stepper (penimbang 0.00 → 5.90KG). RINGAN GILA / BERAT TAK SAMPAI 6KG / bulatan + 5.9KG / SENANG ALIH KE MANA-MANA |
 | 25.0–28.5s | USP | SIAP DATANG DENGAN / MULTIFUNCTION COUNTER |
 | 28.5–31.5s | CTA | NAK TRIM GELEBEH / SEBELUM RAYA? |
 | 31.5–35.0s | CTA | JOM! START WORKOUT SEKARANG! (+ anak panah) |

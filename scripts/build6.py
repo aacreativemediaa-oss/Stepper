@@ -13,7 +13,7 @@ CUTS = [  # (start, end, file, media_start)
     (10.5, 13.3, "f9", 0.0),   # EDU 2: total body (badan penuh)
     (13.3, 16.5, "f17", 3.0),  # EDU 2: punggung/peha/betis close-up
     (16.5, 21.0, "f14", 1.0),  # EDU 3: low intensity, dalam rumah
-    (21.0, 25.0, "f3", 11.6),  # USP: ringan <6kg (product shot)
+    (21.0, 25.0, "f16", 2.9),  # USP: timbang stepper, penimbang 5.90kg
     (25.0, 28.5, "f5", 68.6),  # USP: multifunction counter (muted: ada muzik)
     (28.5, 31.5, "f15", 0.5),  # CTA: trim gelebeh sebelum raya
     (31.5, TOTAL, "f1", 8.0),  # CTA: start workout sekarang
@@ -27,7 +27,7 @@ SFX = [
     (10.50, "whoosh", 0.35), (10.60, "impact", 0.4), (11.30, "pop", 0.4),
     (12.40, "pop", 0.35), (12.95, "pop", 0.35), (13.50, "pop", 0.35), (14.05, "pop", 0.35), (14.60, "pop", 0.35),
     (16.50, "whoosh", 0.35), (16.60, "impact", 0.4), (17.60, "pop", 0.4), (18.40, "pop", 0.4),
-    (21.00, "whoosh", 0.35), (21.55, "impact", 0.45), (22.60, "swoosh", 0.35),
+    (21.00, "whoosh", 0.35), (21.20, "pop", 0.4), (21.80, "ding", 0.3), (22.60, "swoosh", 0.35),
     (25.00, "whoosh", 0.35), (25.35, "ding", 0.3),
     (28.50, "whoosh", 0.35), (29.00, "pop", 0.4),
     (31.50, "whoosh", 0.35), (31.60, "impact", 0.45), (32.30, "pop", 0.4), (33.00, "ding", 0.3),
