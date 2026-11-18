@@ -34,3 +34,15 @@ Style yang diluluskan untuk video stepper (Task 1). Guna semula untuk video sete
 ## Sound effect
 - Disintesis sendiri (`scripts/sfx.py`): whoosh, swoosh, pop, ding, impact, cha-ching, zap, riser.
 - Volume SFX = 0.15 × nilai asas (di bawah voiceover).
+
+## Dua jenis video
+- **A. Ada voiceover** (Task 1, 2, 4, 5): transkrip VO → draf caption untuk disemak → grafik ikut masa VO → caption disembunyi bila sama dengan grafik.
+- **B. Tiada voiceover, ikut brief** (Task 3, 6): Hook / Mini hook / Education / USP / CTA disampaikan sebagai teks motion graphics; setiap mesej ≥2.5–3 saat supaya sempat dibaca.
+
+## Aliran kerja
+1. Muat turun VO + footage dari Drive (folder perlu "Anyone with the link").
+2. Transkrip (Whisper large-v3, bahasa Melayu) + semak footage (contact sheet, bunyi, spektrogram untuk kesan muzik).
+3. Jenis A: tunjuk draf caption, tunggu "ok".
+4. Pilih ≤10 klip ikut ayat/mesej; babak fitur guna footage sebenar (pasang bateri counter, timbang stepper 5.90kg).
+5. Bina, lint, snapshot setiap babak dan semak visual.
+6. Render 60fps; semak VO masih selari, dan semak frame akhir untuk **setiap** blok grafik (terutama CTA) sebelum hantar.
