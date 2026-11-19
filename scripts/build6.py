@@ -35,11 +35,16 @@ SFX = [
 DUR = {"impact": .9, "whoosh": .45, "swoosh": .35, "pop": .12, "ding": 1.2, "tick": .03,
        "riser": 1.2, "cash": 1.0, "zap": .35}
 
+sys.path.insert(0, "/home/user/Stepper/scripts")
+from footage_gain import clip_volumes, print_report
+VIDEO_DIR = OUT.rsplit("/", 1)[0] + "/assets/video"
+VOLS, _rows, _t, _vo = clip_volumes(CUTS, VIDEO_DIR, None, MUTED)
+print_report(_rows, _t, _vo)
 vid_html, vid_js = [], []
 for i, (a, b, src, ms) in enumerate(CUTS):
     vid_html.append(
         (f'<video class="clip bg" id="v{i}" src="assets/video/{src}.mp4" muted playsinline ' if src in MUTED else
-         f'<video class="clip bg" id="v{i}" src="assets/video/{src}.mp4" playsinline data-has-audio="true" data-volume="{FOOTAGE_VOL}" ') +
+         f'<video class="clip bg" id="v{i}" src="assets/video/{src}.mp4" playsinline data-has-audio="true" data-volume="{VOLS[i]}" ') +
         f'data-start="{a:.2f}" data-duration="{b-a:.2f}" '
         f'data-media-start="{ms:.2f}" data-track-index="1"></video>')
     vid_js.append(f'tl.fromTo("#v{i}",{{scale:1.18}},{{scale:1.04,duration:0.35,ease:"power3.out"}},{a:.2f});')
