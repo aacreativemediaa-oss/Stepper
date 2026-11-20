@@ -43,7 +43,7 @@ NEW_HTML = f'''      <!-- HOOK -->
       <div id="hook" class="g clip" data-start="0" data-duration="3.5" data-track-index="10" style="top:330px">
         {WARN}
         <span class="big" id="h1" style="font-size:150px;color:var(--yellow)">3 KESILAPAN</span>
-        <span class="blk pink" id="h2">GUNA V-STEPPER</span>
+        <span class="blk pink" id="h2" style="font-size:70px">GUNA V-STEPPER</span>
       </div>
 
       <!-- KESILAPAN 1 -->

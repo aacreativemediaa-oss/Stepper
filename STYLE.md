@@ -26,7 +26,7 @@ Style yang diluluskan untuk video stepper (Task 1). Guna semula untuk video sete
 - Ilustrasi (kalendar, muscle, tapak kaki, api kalori) dilukis sendiri sebagai SVG dalam template bila tiada gambar dalam folder.
 - Caption: huruf besar, stroke hitam, perkataan aktif jadi kuning, kata kunci jadi hijau neon; 1–3 perkataan setiap paparan, di tengah (top 1150px).
 - Hook: tajuk besar 3 baris, baris akhir atas blok hijau neon condong, dengan bunyi impact + gegar.
-- **Headline hook (tulisan paling besar di atas, cth. "3 KESILAPAN"): 150px** (mulai Task 10). Baris kedua atas blok berwarna: 98px.
+- **Headline hook (tulisan paling besar di atas, cth. "3 KESILAPAN"): 150px** (mulai Task 10). **Sub headline (baris kedua atas blok berwarna, cth. "GUNA V-STEPPER"): 70px.**
 - Ejaan pembetulan: "gelebeh" (bukan kelebihan), "raya", "beg kuning".
 
 ## Warna
