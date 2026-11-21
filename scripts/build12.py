@@ -2,29 +2,29 @@
 import re, sys
 
 TEMPLATE, OUT = sys.argv[1], sys.argv[2]
-TOTAL = 27.5
+TOTAL = 31.5
 FOOTAGE_VOL = 0.3
 SFX_GAIN = 0.15
 
 CUTS = [  # (start, end, file, media_start)
-    (0.0, 6.0, "f8", 0.0),     # HOOK + jadual kalori (trek luar)
-    (6.0, 9.2, "f7", 2.0),     # otot: badan penuh, tali rintangan (luar)
-    (9.2, 12.5, "f17", 6.0),   # otot: close-up kaki
-    (12.5, 16.0, "f5", 60.0),  # USP: pasang counter pada stepper (muted: ada muzik)
-    (16.0, 20.0, "f16", 3.0),  # USP: ringan, timbang 5.9kg
-    (20.0, 23.5, "f13", 5.0),  # CTA: fit 2027 (close-up kasut)
-    (23.5, TOTAL, "f2", 9.0),  # CTA: grab kat beg kuning
+    (0.0, 10.0, "f8", 0.0),    # HOOK + jadual kalori (trek luar), 10s
+    (10.0, 13.2, "f7", 2.0),   # otot: badan penuh, tali rintangan (luar)
+    (13.2, 16.5, "f17", 6.0),  # otot: close-up kaki
+    (16.5, 20.0, "f5", 60.0),  # USP: pasang counter pada stepper (muted: ada muzik)
+    (20.0, 24.0, "f16", 3.0),  # USP: ringan, timbang 5.9kg
+    (24.0, 27.5, "f13", 5.0),  # CTA: fit 2027 (close-up kasut)
+    (27.5, TOTAL, "f2", 9.0),  # CTA: grab kat beg kuning
 ]
 MUTED = {"f5"}
 
 SFX = [
-    (0.00, "impact", 0.55), (0.05, "whoosh", 0.35), (1.00, "pop", 0.4), (2.00, "ding", 0.3),
-    (6.00, "whoosh", 0.35), (6.10, "impact", 0.4), (6.80, "riser", 0.25),
-    (8.40, "pop", 0.35), (8.95, "pop", 0.35), (9.50, "pop", 0.35), (10.05, "pop", 0.35), (10.60, "pop", 0.35),
-    (12.50, "whoosh", 0.35), (12.85, "ding", 0.3), (14.00, "pop", 0.35), (14.40, "pop", 0.35), (14.80, "pop", 0.35),
-    (16.00, "whoosh", 0.35), (16.30, "pop", 0.4), (16.80, "ding", 0.3), (17.55, "swoosh", 0.35),
-    (20.00, "whoosh", 0.35), (20.50, "swoosh", 0.35), (21.30, "impact", 0.45),
-    (23.50, "whoosh", 0.35), (23.60, "pop", 0.4), (24.20, "ding", 0.3), (24.30, "pop", 0.4),
+    (0.00, "impact", 0.55), (0.05, "whoosh", 0.35), (0.30, "pop", 0.35), (1.50, "pop", 0.35), (2.70, "pop", 0.35), (3.90, "pop", 0.35), (5.10, "pop", 0.35), (6.30, "pop", 0.35), (7.80, "ding", 0.3),
+    (10.00, "whoosh", 0.35), (10.10, "impact", 0.4), (10.80, "riser", 0.25),
+    (12.40, "pop", 0.35), (12.95, "pop", 0.35), (13.50, "pop", 0.35), (14.05, "pop", 0.35), (14.60, "pop", 0.35),
+    (16.50, "whoosh", 0.35), (16.85, "ding", 0.3), (18.00, "pop", 0.35), (18.40, "pop", 0.35), (18.80, "pop", 0.35),
+    (20.00, "whoosh", 0.35), (20.30, "pop", 0.4), (20.80, "ding", 0.3), (21.55, "swoosh", 0.35),
+    (24.00, "whoosh", 0.35), (24.50, "swoosh", 0.35), (25.30, "impact", 0.45),
+    (27.50, "whoosh", 0.35), (27.60, "pop", 0.4), (28.20, "ding", 0.3), (28.30, "pop", 0.4),
 ]
 DUR = {"impact": .9, "whoosh": .45, "swoosh": .35, "pop": .12, "ding": 1.2, "tick": .03,
        "riser": 1.2, "cash": 1.0, "zap": .35}

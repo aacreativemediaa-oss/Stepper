@@ -23,7 +23,7 @@ def block(src, bid):
 def timed(html, start, dur):
     return re.sub(r'data-start="[0-9.]+" data-duration="[0-9.]+"', f'data-start="{start}" data-duration="{dur}"', html, count=1)
 
-table = timed(block(t7, 'table'), 0, 6.0).replace('top: 520px', '')
+table = timed(block(t7, 'table'), 0, 10.0).replace('top: 520px', '')
 assert '±100<small>' in table and '±210<small>' in table
 muscles = timed(block(t8, 'muscles'), 6.25, 6.25)
 usp = timed(block(t8, 'usp'), 12.55, 3.45).replace('>SIAP ADA<', '>ADA SEKALI<')
@@ -46,12 +46,12 @@ body = f'''    </style>
       <div id="vignette" class="layer"></div>
 
       <!-- HOOK + EDU 1: straight into the table (0-6s). Headline 150px, sub headline 70px -->
-      <div id="ttitle" class="g clip" data-start="0" data-duration="6.0" data-track-index="10" style="top:110px">
+      <div id="ttitle" class="g clip" data-start="0" data-duration="10.0" data-track-index="10" style="top:110px">
         <span class="big" id="hk1" style="font-size:150px;color:var(--lime)">10 MINIT</span>
         <span class="blk pink" id="hk2" style="font-size:70px">LATIHAN STEPPER</span>
       </div>
       {table.replace('<div id="table" class="g clip"', '<div id="table" class="g clip" style="top:520px"')}
-      <div id="vs" class="g clip" data-start="0" data-duration="6.0" data-track-index="12" style="top:1335px">
+      <div id="vs" class="g clip" data-start="7.8" data-duration="2.2" data-track-index="12" style="top:1335px">
         <span class="blk" id="vs1" style="font-size:66px">BERAT BADAN VS KALORI</span>
       </div>
 
@@ -99,10 +99,10 @@ body = f'''    </style>
       tl.fromTo("#hk1", {{ scale: 1.25 }}, {{ scale: 1, duration: 0.3, ease: "power3.out" }}, 0);
       tl.to("#root", {{ keyframes: {{ x: [0, -12, 10, -6, 0] }}, duration: 0.22 }}, 0.05);
       tl.fromTo("#hk2", {{ rotation: -10, scale: 0.8 }}, {{ rotation: -3, scale: 1, duration: 0.3, ease: "back.out(2.2)" }}, 0.1);
-{chr(10).join(f'      tl.to("#b{i}", {{ scaleX: 1.04, duration: 0.18, yoyo: true, repeat: 1, ease: "sine.inOut" }}, {0.3 + i*0.15:.2f});' for i in range(6))}
-      tl.to("#r5", {{ scale: 1.04, duration: 0.25, yoyo: true, repeat: 5, ease: "sine.inOut" }}, 2.0);
-      tl.fromTo("#vs1", {{ scale: 0, rotation: 15 }}, {{ scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }}, 1.0);
-      tl.fromTo("#note span", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, 1.6);
+{chr(10).join(f'      tl.fromTo("#r{i}", {{ x: -900, opacity: 0 }}, {{ x: 0, opacity: 1, duration: 0.3, ease: "power3.out" }}, {0.3 + i*1.2:.2f});' + chr(10) + f'      tl.fromTo("#b{i}", {{ scaleX: 0 }}, {{ scaleX: 1, duration: 0.5, ease: "power2.out" }}, {0.45 + i*1.2:.2f});' for i in range(6))}
+      tl.to("#r5", {{ scale: 1.04, duration: 0.25, yoyo: true, repeat: 3, ease: "sine.inOut" }}, 7.4);
+      tl.fromTo("#vs1", {{ scale: 0, rotation: 15 }}, {{ scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }}, 7.8);
+      tl.fromTo("#note span", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3 }}, 8.2);
 
       // otot
       tl.fromTo("#mt1", {{ scale: 0, rotation: -15 }}, {{ scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }}, 6.1);
@@ -142,8 +142,13 @@ body = f'''    </style>
 </html>
 '''
 # note under table
-note = '<div id="note" class="g clip" data-start="1.6" data-duration="4.4" data-track-index="12" style="top:1440px"><span>*Anggaran untuk 10 minit latihan</span></div>'
+note = '<div id="note" class="g clip" data-start="8.2" data-duration="1.8" data-track-index="12" style="top:1440px"><span>*Anggaran untuk 10 minit latihan</span></div>'
 body = body.replace('      <!-- EDU 2: otot -->', '      ' + note + '\n\n      <!-- EDU 2: otot -->', 1)
+def _shift(s, a_mark, b_mark, pat):
+    a = s.index(a_mark); b = s.index(b_mark, a)
+    return s[:a] + re.sub(pat, lambda m: m.group(1) + f"{float(m.group(2)) + 4:.2f}" + m.group(3), s[a:b]) + s[b:]
+body = _shift(body, '      <!-- EDU 2: otot -->', '<div id="flash"', r'(data-start=")([0-9.]+)(")')
+body = _shift(body, '      // otot', 'window.__timelines["main"]', r'(, )([0-9.]+)(\);)')
 t = head + body
 # the table's own header row already says BERAT BADAN / KALORI TERBAKAR; table title block from t7 is not used
 b = t[t.index('<body>'):]
@@ -154,25 +159,25 @@ for need in ['id="table"', 'id="muscles"', 'id="usp"', 'id="u1ring"', 'id="cal"'
 open(S + '/template12.html', 'w').write(t)
 
 bsrc = open(S + '/build9.py').read()
-bsrc = bsrc.replace('TOTAL = 38.0', 'TOTAL = 27.5')
+bsrc = bsrc.replace('TOTAL = 38.0', 'TOTAL = 31.5')
 bsrc, n = re.subn(r'CUTS = \[.*?\nMUTED = \{"f5"\}', '''CUTS = [  # (start, end, file, media_start)
-    (0.0, 6.0, "f8", 0.0),     # HOOK + jadual kalori (trek luar)
-    (6.0, 9.2, "f7", 2.0),     # otot: badan penuh, tali rintangan (luar)
-    (9.2, 12.5, "f17", 6.0),   # otot: close-up kaki
-    (12.5, 16.0, "f5", 60.0),  # USP: pasang counter pada stepper (muted: ada muzik)
-    (16.0, 20.0, "f16", 3.0),  # USP: ringan, timbang 5.9kg
-    (20.0, 23.5, "f13", 5.0),  # CTA: fit 2027 (close-up kasut)
-    (23.5, TOTAL, "f2", 9.0),  # CTA: grab kat beg kuning
+    (0.0, 10.0, "f8", 0.0),    # HOOK + jadual kalori (trek luar), 10s
+    (10.0, 13.2, "f7", 2.0),   # otot: badan penuh, tali rintangan (luar)
+    (13.2, 16.5, "f17", 6.0),  # otot: close-up kaki
+    (16.5, 20.0, "f5", 60.0),  # USP: pasang counter pada stepper (muted: ada muzik)
+    (20.0, 24.0, "f16", 3.0),  # USP: ringan, timbang 5.9kg
+    (24.0, 27.5, "f13", 5.0),  # CTA: fit 2027 (close-up kasut)
+    (27.5, TOTAL, "f2", 9.0),  # CTA: grab kat beg kuning
 ]
 MUTED = {"f5"}''', bsrc, flags=re.S); assert n == 1
 bsrc, n = re.subn(r'SFX = \[\n.*?\n\]', '''SFX = [
-    (0.00, "impact", 0.55), (0.05, "whoosh", 0.35), (1.00, "pop", 0.4), (2.00, "ding", 0.3),
-    (6.00, "whoosh", 0.35), (6.10, "impact", 0.4), (6.80, "riser", 0.25),
-    (8.40, "pop", 0.35), (8.95, "pop", 0.35), (9.50, "pop", 0.35), (10.05, "pop", 0.35), (10.60, "pop", 0.35),
-    (12.50, "whoosh", 0.35), (12.85, "ding", 0.3), (14.00, "pop", 0.35), (14.40, "pop", 0.35), (14.80, "pop", 0.35),
-    (16.00, "whoosh", 0.35), (16.30, "pop", 0.4), (16.80, "ding", 0.3), (17.55, "swoosh", 0.35),
-    (20.00, "whoosh", 0.35), (20.50, "swoosh", 0.35), (21.30, "impact", 0.45),
-    (23.50, "whoosh", 0.35), (23.60, "pop", 0.4), (24.20, "ding", 0.3), (24.30, "pop", 0.4),
+    (0.00, "impact", 0.55), (0.05, "whoosh", 0.35), (0.30, "pop", 0.35), (1.50, "pop", 0.35), (2.70, "pop", 0.35), (3.90, "pop", 0.35), (5.10, "pop", 0.35), (6.30, "pop", 0.35), (7.80, "ding", 0.3),
+    (10.00, "whoosh", 0.35), (10.10, "impact", 0.4), (10.80, "riser", 0.25),
+    (12.40, "pop", 0.35), (12.95, "pop", 0.35), (13.50, "pop", 0.35), (14.05, "pop", 0.35), (14.60, "pop", 0.35),
+    (16.50, "whoosh", 0.35), (16.85, "ding", 0.3), (18.00, "pop", 0.35), (18.40, "pop", 0.35), (18.80, "pop", 0.35),
+    (20.00, "whoosh", 0.35), (20.30, "pop", 0.4), (20.80, "ding", 0.3), (21.55, "swoosh", 0.35),
+    (24.00, "whoosh", 0.35), (24.50, "swoosh", 0.35), (25.30, "impact", 0.45),
+    (27.50, "whoosh", 0.35), (27.60, "pop", 0.4), (28.20, "ding", 0.3), (28.30, "pop", 0.4),
 ]''', bsrc, flags=re.S); assert n == 1
 open(S + '/build12.py', 'w').write(bsrc)
 print('ok')
