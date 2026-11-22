@@ -21,12 +21,21 @@ Style yang diluluskan untuk video stepper (Task 1). Guna semula untuk video sete
 
 ## Teks
 - Font: Anton (tajuk/caption), Montserrat 800/900 (label/pill). Saiz font = 70% daripada versi pertama.
-- **Caption/subtitle: 60px** (mulai Task 5; Task 4 = 65px), stroke hitam 5px.
+- **Saiz tulisan (mulai Task 14):**
+
+  | Tulisan | Sebelum | Sekarang |
+  |---|---|---|
+  | Headline | 150px | **100px** |
+  | Sub-headline / pelekat save | 70px | **47px** |
+  | Caption | 60px | **40px** (stroke hitam ~3–4px) |
+  | Nombor heart rate | 96px | **64px** |
+  | Chip, nama warna, label zon | 28px | **19px** |
+
+  Saiz lama (Task 4–13): caption 65px → 60px, headline 150px, sub headline 70px.
 - **Jangan bertindih:** kalau grafik besar dah tunjuk ayat yang sama, sembunyikan caption untuk ayat tu (guna grafik sahaja). Automatik dalam `scripts/build4.py` (GFX + dup_of_graphic). Keputusan ikut klausa penuh (dipapar semua atau disembunyi semua), sembunyi jika ≥1/3 perkataan utama ada dalam grafik — lihat `scripts/build5.py`.
 - Ilustrasi (kalendar, muscle, tapak kaki, api kalori) dilukis sendiri sebagai SVG dalam template bila tiada gambar dalam folder.
 - Caption: huruf besar, stroke hitam, perkataan aktif jadi kuning, kata kunci jadi hijau neon; 1–3 perkataan setiap paparan, di tengah (top 1150px).
 - Hook: tajuk besar 3 baris, baris akhir atas blok hijau neon condong, dengan bunyi impact + gegar.
-- **Headline hook (tulisan paling besar di atas, cth. "3 KESILAPAN"): 150px** (mulai Task 10). **Sub headline (baris kedua atas blok berwarna, cth. "GUNA V-STEPPER"): 70px.**
 - Ejaan pembetulan: "gelebeh" (bukan kelebihan), "raya", "beg kuning".
 
 ## Warna
