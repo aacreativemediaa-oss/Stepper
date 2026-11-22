@@ -31,7 +31,7 @@ Rujukan tetap untuk setiap video baru. Kemas kini terakhir: sebelum Task 14.
 | Nombor heart rate | **64px** |
 | Chip, nama warna, label zon | **19px** |
 
-Tulisan lain yang tak disenaraikan (kotak faedah, pill, label kecil) kekal saiz sedia ada melainkan diminta.
+**Tulisan paling besar 100px sahaja** — tiada tulisan lain (nombor, kalendar, kad CTA, dll.) melebihi 100px. Tulisan lain yang tak disenaraikan kekal saiz sedia ada jika ≤100px.
 Saiz lama (Task 4–13): headline 150px, sub headline 70px, caption 65px → 60px.
 
 ## Teks & caption

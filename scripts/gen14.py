@@ -79,3 +79,17 @@ R('''    (0.0, 10.0, "f8", 0.0),    # HOOK + jadual kalori (trek luar), 10s
 R('(16.50, "whoosh", 0.35), (16.85, "ding", 0.3), (18.00, "pop", 0.35), (18.40, "pop", 0.35), (18.80, "pop", 0.35),',
   '(16.50, "whoosh", 0.35), (16.75, "riser", 0.25), (17.75, "impact", 0.45), (18.30, "pop", 0.4),') if '(16.85, "ding", 0.3)' in g else None
 exec(compile(g, 'gen12-as-14', 'exec'))
+
+# ---- format: largest text 100px; "15 MINIT" block moved lower
+t14 = open(S + '/template14.html').read()
+t14 = t14.replace('style="top:150px">\n        <span class="big" id="hk1"', 'style="top:250px">\n        <span class="big" id="hk1"')
+assert 'style="top:250px">\n        <span class="big" id="hk1"' in t14
+def cap(m):
+    v = int(m.group(2))
+    return f'{m.group(1)}{min(v, 100)}px'
+t14 = re.sub(r'(font-size: ?)(\d+)px', cap, t14)
+t14 = re.sub(r'(font-size=")(\d+)(")', lambda m: f'{m.group(1)}{min(int(m.group(2)),100)}{m.group(3)}', t14)
+over = [int(x) for x in re.findall(r'font-size: ?(\d+)px', t14) if int(x) > 100]
+assert not over, over
+open(S + '/template14.html', 'w').write(t14)
+print('capped to 100px; hook moved to top 250px')
