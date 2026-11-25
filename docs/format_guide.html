@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Format Edit Video V-Stepper</title>
+<style>
+  @font-face { font-family: "Anton"; src: url("fonts/anton-latin-400-normal.woff2") format("woff2"); }
+  @font-face { font-family: "Mont"; src: url("fonts/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+  @font-face { font-family: "Mont"; src: url("fonts/montserrat-latin-900-normal.woff2") format("woff2"); font-weight: 900; }
+  @page { size: A4; margin: 16mm 14mm 16mm 14mm; }
+  :root { --pink:#ff2e7e; --lime:#c6ff00; --yellow:#ffd400; --red:#ff3b30; --ink:#141414; --muted:#5b5b66; --line:#e3e3e8; }
+  * { box-sizing: border-box; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10.5pt; line-height: 1.45; color: var(--ink); margin: 0; }
+  h1, h2, h3 { font-family: "Anton", sans-serif; font-weight: 400; letter-spacing: 0.01em; margin: 0; }
+  h1 { font-size: 34pt; line-height: 1; }
+  h2 { font-size: 17pt; margin: 18pt 0 6pt; padding: 3pt 10pt 1pt; background: var(--ink); color: #fff; display: inline-block; }
+  h2.a { background: var(--pink); } h2.b { background: var(--lime); color: #000; }
+  h3 { font-size: 12.5pt; margin: 12pt 0 4pt; }
+  p { margin: 4pt 0; }
+  h2, h3, .k { break-after: avoid; page-break-after: avoid; }
+  h3 + table, h3 + ul, h3 + ol { break-before: avoid; }
+  ul, ol { margin: 4pt 0 4pt 16pt; padding: 0; } li { margin: 2pt 0; }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 8pt; font-size: 9.5pt; page-break-inside: avoid; }
+  th { text-align: left; background: #f2f2f5; font-family: "Mont"; font-weight: 900; font-size: 8.5pt; letter-spacing: 0.04em; text-transform: uppercase; }
+  th, td { border: 1px solid var(--line); padding: 4pt 6pt; vertical-align: top; }
+  td b { white-space: nowrap; }
+  .cover { border-bottom: 6px solid var(--ink); padding-bottom: 10pt; margin-bottom: 6pt; }
+  .cover .tag { font-family: "Mont"; font-weight: 900; font-size: 9pt; letter-spacing: 0.15em; color: var(--pink); }
+  .cover .sub { font-size: 11pt; color: var(--muted); margin-top: 6pt; }
+  .bar { height: 6px; background: linear-gradient(90deg, var(--pink), var(--lime)); margin: 8pt 0 0; }
+  .box { border: 1.5px solid var(--ink); border-radius: 6pt; padding: 8pt 10pt; margin: 8pt 0; page-break-inside: avoid; }
+  .box.warn { border-color: var(--red); background: #fff4f3; }
+  .box.tip { border-color: #8bb300; background: #f8ffe5; }
+  .k { font-family: "Mont"; font-weight: 900; font-size: 8.5pt; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+  code, .mono { font-family: "SFMono-Regular", Menlo, Consolas, monospace; font-size: 9pt; background: #f2f2f5; padding: 0 3pt; border-radius: 3pt; }
+  pre { font-family: "SFMono-Regular", Menlo, Consolas, monospace; font-size: 9pt; background: #f6f6f8; border: 1px solid var(--line); border-radius: 6pt; padding: 8pt 10pt; white-space: pre-wrap; margin: 6pt 0; page-break-inside: avoid; }
+  .swatch { display: inline-block; width: 11pt; height: 11pt; border: 1px solid #000; vertical-align: -2pt; margin-right: 4pt; }
+  .two { display: flex; gap: 12pt; } .two > div { flex: 1; }
+  .page { page-break-before: always; }
+  .pill { display: inline-block; font-family: "Mont"; font-weight: 900; font-size: 8pt; padding: 1pt 7pt; border-radius: 99pt; border: 1px solid #000; }
+  .footer { margin-top: 16pt; font-size: 8.5pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 6pt; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="tag">RUJUKAN TETAP · KEMAS KINI SELEPAS TASK 18</div>
+  <h1>FORMAT EDIT VIDEO<br>V-STEPPER</h1>
+  <div class="sub">Format lengkap untuk menghasilkan video iklan V-Stepper dengan Hyperframes — untuk video <b>ada voiceover (VO)</b> dan <b>tanpa voiceover</b>.</div>
+  <div class="bar"></div>
+</div>
+
+<h2>1. Spesifikasi output (semua video)</h2>
+<table>
+  <tr><th style="width:32%">Perkara</th><th>Format</th></tr>
+  <tr><td>Resolusi</td><td><b>1080 × 1920</b> (menegak 9:16)</td></tr>
+  <tr><td>Frame rate</td><td><b>60fps</b></td></tr>
+  <tr><td>Saiz fail</td><td><b>≤ 70MB</b>. Bitrate video dikira ikut durasi; kalau masih lebih, video di-encode semula 2-pass (audio tak disentuh).</td></tr>
+  <tr><td>Muzik latar</td><td><b>Tiada</b></td></tr>
+  <tr><td>Alat</td><td>Hyperframes (HTML + GSAP → MP4)</td></tr>
+  <tr><td>Bilangan klip</td><td><b>Maksimum 10 klip</b>. Intro satu shot sahaja (jangan tukar laju).</td></tr>
+</table>
+
+<h2>2. Saiz tulisan</h2>
+<table>
+  <tr><th style="width:42%">Tulisan</th><th style="width:16%">Saiz</th><th>Nota</th></tr>
+  <tr><td>Headline (hook)</td><td><b>100px</b></td><td>Tulisan paling besar dalam video</td></tr>
+  <tr><td>Sub-headline / pelekat save</td><td><b>47px</b></td><td>Atas blok berwarna (pink/hijau)</td></tr>
+  <tr><td>Caption / subtitle (video ada VO)</td><td><b>40px</b></td><td>Stroke hitam ~3–4px</td></tr>
+  <tr><td>Nombor heart rate</td><td><b>64px</b></td><td></td></tr>
+  <tr><td>Chip, nama warna, label zon</td><td><b>19px</b></td><td></td></tr>
+  <tr><td>Kad CTA, nombor statistik (100KG+), kalendar "2027"</td><td><b>≤100px</b></td><td>Tidak boleh lebih headline</td></tr>
+</table>
+<div class="box warn"><b>Peraturan utama:</b> tulisan paling besar <b>100px sahaja</b> — tiada nombor, kalendar, kad CTA atau label lain melebihi 100px. Tulisan lain yang tak disenaraikan kekal saiz sedia ada jika ≤100px.</div>
+
+<h3>Saiz infografik (terkini, Task 18 — 90% daripada asal)</h3>
+<table>
+  <tr><th style="width:42%">Elemen</th><th>Ukuran</th></tr>
+  <tr><td>Jadual berat badan vs kalori</td><td>Lebar <b>864px</b> · tinggi baris <b>101px</b> · berat &amp; kalori <b>68px</b> · header <b>25px</b> · bar tinggi 40px</td></tr>
+  <tr><td>Rajah otot (depan &amp; belakang)</td><td>Lebar panel <b>882px</b> · pill otot <b>32px</b> · label DEPAN/BELAKANG 25px</td></tr>
+  <tr><td>Nota "*Anggaran…" / baris fakta</td><td>20–28px</td></tr>
+</table>
+
+<h2>3. Font &amp; warna</h2>
+<div class="two">
+  <div>
+    <table>
+      <tr><th>Font</th><th>Guna untuk</th></tr>
+      <tr><td><span style="font-family:Anton;font-size:12pt">ANTON</span></td><td>Headline, caption, nombor, tajuk babak</td></tr>
+      <tr><td><span style="font-family:Mont;font-weight:900">MONTSERRAT 800/900</span></td><td>Pill, label kecil, header jadual, nota</td></tr>
+    </table>
+  </div>
+  <div>
+    <table>
+      <tr><th>Warna</th><th>Kod</th></tr>
+      <tr><td><span class="swatch" style="background:#ff2e7e"></span>Pink</td><td>#ff2e7e</td></tr>
+      <tr><td><span class="swatch" style="background:#c6ff00"></span>Hijau neon</td><td>#c6ff00</td></tr>
+      <tr><td><span class="swatch" style="background:#ffd400"></span>Kuning</td><td>#ffd400</td></tr>
+      <tr><td><span class="swatch" style="background:#ff3b30"></span>Merah</td><td>#ff3b30</td></tr>
+      <tr><td><span class="swatch" style="background:#ff8a00"></span>Oren</td><td>#ff8a00</td></tr>
+    </table>
+  </div>
+</div>
+
+<h2>4. Bunyi</h2>
+<table>
+  <tr><th style="width:32%">Bunyi</th><th>Peraturan</th></tr>
+  <tr><td>Voiceover asal</td><td><b>Tidak diubah</b> — volume 100%, tiada potongan. Disemak selari dengan fail asal selepas render.</td></tr>
+  <tr><td>Bunyi asal footage</td><td>Setiap klip diselaraskan ke <b>−57 LUFS</b> (atau <b>27 dB di bawah VO</b> kalau VO bukan sekitar −30 LUFS).<br>Klip kuat diperlahankan; klip perlahan dikuatkan, <b>had +12 dB</b>. Diukur pada segmen yang digunakan sahaja.</td></tr>
+  <tr><td>Footage bermuzik</td><td><b>Dimatikan</b>: <span class="mono">lv_0_20250521120347</span> (unboxing/counter), <span class="mono">video_20260531_203850</span> &amp; <span class="mono">video_20260523_095507</span> (trek luar).</td></tr>
+  <tr><td>Sound effect</td><td>Disintesis sendiri (tiada isu hak cipta): whoosh, swoosh, pop, ding, impact, cha-ching, zap, riser, tick. Volume rendah, di bawah VO.</td></tr>
+</table>
+
+<h2>5. Potongan &amp; shot</h2>
+<ul>
+  <li><b>≤10 klip</b>, ~3–8 saat setiap klip ikut ayat/mesej. Intro satu shot sahaja.</li>
+  <li>Setiap klip: zoom masuk ringkas (1.18 → 1.04 dalam 0.35s) + push perlahan; kilatan putih ringkas pada setiap potongan.</li>
+  <li>Babak fitur guna <b>footage sebenar</b>: pasang bateri / tekan counter (multifunction counter), timbang stepper <b>5.90kg</b> (berat &lt;6kg).</li>
+  <li>Bila diminta: <b>tukar shot</b> berbanding video sebelum ini; atau <b>terus mula dengan visual</b> (frame pertama terus tunjuk grafik / nombor).</li>
+</ul>
+
+<h2>6. Grafik &amp; overlay</h2>
+<table>
+  <tr><th style="width:32%">Elemen</th><th>Penerangan</th></tr>
+  <tr><td>Hook</td><td>Headline 100px + sub-headline 47px atas blok berwarna, bunyi impact + gegar skrin. Ikon sokongan (⚠, api, jam randik, kalendar) bila sesuai.</td></tr>
+  <tr><td>Education bernombor</td><td>Lencana ①②③ (bulat pink/merah) + tajuk atas blok hijau.</td></tr>
+  <tr><td>Jadual / senarai</td><td>Baris keluar <b>satu demi satu</b> (cth. 50kg → 100kg). Kalau "terus mula dengan kalori", baris pertama dah ada pada frame pertama.</td></tr>
+  <tr><td>Pill</td><td>Pill ✓ dengan ikon (rumah, TV, kasut, dumbbell), pill ⚠ merah untuk risiko, pill hijau "cara betul".</td></tr>
+  <tr><td>Ilustrasi</td><td>Dilukis sendiri (SVG) bila folder tiada gambar: kalendar 2026→2027, rajah otot depan/belakang, muscle flex, tapak kaki, api, kasut, dumbbell, meter laju, ikon repost, orang berjalan.</td></tr>
+  <tr><td>USP</td><td>"MULTIFUNCTION COUNTER" + ✓STEPS ✓MASA ✓KALORI · "BERAT TAK SAMPAI 6KG" + bulatan hijau "5.9KG" pada penimbang · "100KG+" (kiraan).</td></tr>
+  <tr><td>CTA</td><td>Kalendar 2026 → 2027 + soalan, kemudian kad putih (cth. "START STEPPER SEKARANG!"). Pill <b>beg kuning</b> + anak panah ke bawah hanya bila CTA sebut beg kuning.</td></tr>
+  <tr><td>Overlay</td><td>Vignette + bar progres pink → hijau di atas.</td></tr>
+</table>
+
+<div class="page"></div>
+<h2 class="a">7. Format A — Video ADA voiceover</h2>
+<h3>Apa yang perlu dihantar</h3>
+<ul>
+  <li>Link fail VO (biasanya skrin hitam + suara) dan link folder footage (<b>"Anyone with the link"</b>).</li>
+  <li>Arahan tambahan (jika ada): saiz caption, gambar rujukan, shot yang mahu/tak mahu.</li>
+</ul>
+<h3>Aliran kerja</h3>
+<ol>
+  <li><b>Transkrip</b> VO (Whisper large-v3, Bahasa Melayu) dengan masa setiap perkataan.</li>
+  <li><b>Draf caption dihantar untuk disemak</b> — perkataan yang tak jelas ditanda ⚠. <b>Tunggu "ok"</b> sebelum edit.</li>
+  <li>Pilih ≤10 klip ikut ayat VO; grafik dipasang ikut masa ayat.</li>
+  <li>Caption 40px dipapar 2–3 perkataan setiap kali; perkataan aktif <b>kuning</b>, kata kunci <b>hijau neon</b>.</li>
+  <li><b>Jangan bertindih:</b> kalau grafik dah tunjuk klausa yang sama, caption untuk klausa itu disembunyikan (ikut klausa penuh).</li>
+  <li>Bila diminta: hantar <b>draf preview</b> (30fps, kualiti rendah) untuk semakan sebelum render final.</li>
+  <li>Render final 60fps ≤70MB → semak VO selari &amp; frame setiap blok grafik → hantar.</li>
+</ol>
+<h3>Struktur biasa (ikut VO)</h3>
+<table>
+  <tr><th style="width:22%">Bahagian</th><th>Isi grafik</th></tr>
+  <tr><td>Hook (ayat 1)</td><td>Headline nombor utama (cth. "200 KALORI") + sub-headline ("15 MINIT STEPPER"). Caption bermula ayat 2.</td></tr>
+  <tr><td>Education</td><td>Perbandingan (≈ briskwalk), TOTAL BODY WORKOUT, rajah otot, 5 MINIT BERPELUH LENCUN</td></tr>
+  <tr><td>USP</td><td>100KG+, compact &amp; ringan (5.9KG), depan TV / dalam bilik, digital counter, unit terjual</td></tr>
+  <tr><td>Harga</td><td>"DULU <s>LEBIH RM100</s>" → "SEKARANG MURAH!" → "RUGI TAK GRAB!"</td></tr>
+  <tr><td>CTA</td><td>Kad "GRAB SEKARANG!" + pill "BEG KUNING BAWAH NI" + anak panah</td></tr>
+</table>
+<h3>Ejaan tetap (pembetulan transkrip)</h3>
+<p><b>gelebeh</b> (bukan kelebihan/gelebi) · <b>beg kuning</b> (bukan bed/bit/bekon) · <b>briskwalk</b> · <b>viral saja-saja</b> · <b>raya</b> · <b>compact</b> · nombor dicantum (400,000).</p>
+
+<h2 class="b">8. Format B — Video TANPA voiceover (ikut brief)</h2>
+<h3>Apa yang perlu dihantar</h3>
+<ul>
+  <li>Link folder footage + brief: <b>Hook · (Mini hook) · Education · USP · CTA</b>.</li>
+  <li>Pilihan: durasi setiap bahagian, "terus mula dengan …", gambar rujukan, "ubah shot".</li>
+</ul>
+<h3>Aliran kerja</h3>
+<ol>
+  <li>Semak footage (tiada percakapan → semua mesej sebagai teks motion graphics).</li>
+  <li>Kalau brief tak jelas (cth. "Level 1–5" tapi 4 diterangkan, hook tak dinyatakan) → <b>tanya dulu</b>.</li>
+  <li>Fakta dari Internet dicari dan disertakan sumber; angka anggaran ditanda "*Anggaran".</li>
+  <li>Bina, snapshot setiap babak → render final → semak frame setiap blok → hantar.</li>
+</ol>
+<h3>Struktur &amp; durasi biasa</h3>
+<table>
+  <tr><th style="width:22%">Bahagian</th><th style="width:16%">Durasi</th><th>Isi</th></tr>
+  <tr><td>Hook</td><td>3–3.5s</td><td>Headline 100px + sub-headline 47px (cth. "3 KESILAPAN / GUNA V-STEPPER", "BRISKWALK VS STEPPER")</td></tr>
+  <tr><td>Mini hook (jika ada)</td><td>~2s</td><td>Pelekat save 47px (cth. "SAVE VIDEO NI SEBELUM HILANG!")</td></tr>
+  <tr><td>Education (setiap poin)</td><td>6–10s</td><td>Lencana ①②③ + tajuk + ilustrasi + pill. Jadual kalori: 10s, baris satu per satu.</td></tr>
+  <tr><td>USP (setiap poin)</td><td>3.5–4s</td><td>Counter, &lt;6kg (5.9KG), 100KG+, otot seluruh badan</td></tr>
+  <tr><td>CTA</td><td>3s + 4s</td><td>Kalendar 2027 + soalan → kad "START STEPPER SEKARANG!" / "REPOST VIDEO NI!"</td></tr>
+  <tr><td colspan="3"><b>Jumlah biasa: 30–45 saat</b>. Setiap mesej teks dipapar ≥2.5–3s supaya sempat dibaca, atau ikut durasi yang diminta.</td></tr>
+</table>
+
+<div class="page"></div>
+<h2>9. Data, fakta &amp; angka</h2>
+<ul>
+  <li><b>Tiada nombor atau data palsu.</b> Angka hanya dari VO, brief, footage, atau sumber Internet yang disebut.</li>
+  <li>Anggaran ditanda <b>"*Anggaran untuk X minit latihan"</b>.</li>
+</ul>
+<table>
+  <tr><th style="width:30%">Data</th><th>Nilai yang digunakan</th></tr>
+  <tr><td>Kalori stepper 10 minit (rujukan pengguna)</td><td>50kg ±100 · 60kg ±120 · 70kg ±140 · 80kg ±160 · 90kg ±180 · 100kg ±210</td></tr>
+  <tr><td>Kalori stepper 15 minit</td><td>Jadual 10 minit × 1.5 (anggaran)</td></tr>
+  <tr><td>55–115kg (10 minit)</td><td>Disambung ~2.0–2.1 kal/kg: 110 · 130 · 150 · 170 · 190 · 220 · 240 (anggaran)</td></tr>
+  <tr><td>Briskwalk 10 minit</td><td>MET 4.8 (2024 Adult Compendium) → 42/50/59/67/76/84 kal (50–100kg)</td></tr>
+  <tr><td>Berat stepper</td><td>5.90kg (footage penimbang)</td></tr>
+  <tr><td>Otot dilatih</td><td>Quadriceps, hamstring, glutes &amp; betis; core untuk imbangan; bahu &amp; lengan bila guna tali resistance (Well+Good, Chron, Women's Health, Peloton)</td></tr>
+</table>
+
+<h2>10. Senarai footage dalam folder</h2>
+<table>
+  <tr><th style="width:38%">Fail</th><th>Isi</th><th style="width:16%">Bunyi</th></tr>
+  <tr><td class="mono">video_20260618_095634 / _095707</td><td>Dumbbell depan TV, kasut pink/hijau</td><td>−57 LUFS</td></tr>
+  <tr><td class="mono">video_20260618_100043</td><td>Kasut pink/hijau, dumbbell, ruang tamu</td><td>−57 LUFS</td></tr>
+  <tr><td class="mono">video_20260519_173201</td><td>Kettlebell, bilik dengan TV</td><td>−57 LUFS</td></tr>
+  <tr><td class="mono">video_20260531_203315</td><td>Luar, baju putih "RUNNING", tali</td><td>−57 LUFS</td></tr>
+  <tr><td class="mono">video_20260531_203850</td><td>Luar atas rumput, tali</td><td><b>Dimatikan</b></td></tr>
+  <tr><td class="mono">lv_0_20250521120347</td><td>Unboxing 95s: angkat stepper, pasang bateri, tekan counter</td><td><b>Dimatikan</b></td></tr>
+  <tr><td class="mono">video_20260523_095507</td><td>Trek luar, baju hitam, tali</td><td><b>Dimatikan</b></td></tr>
+  <tr><td class="mono">video_20260601_102811</td><td>Trek luar, topi, tali</td><td>−57 LUFS</td></tr>
+  <tr><td class="mono">video_20260604_190946 … _191147</td><td>Bilik, baju hitam, tali resistance (4 klip)</td><td>−57 LUFS</td></tr>
+  <tr><td class="mono">video_20260615_130712</td><td>Close-up kasut atas stepper (lantai kayu)</td><td>−57 LUFS</td></tr>
+  <tr><td class="mono">video_20260615_130600</td><td>Ruang tamu, baju merah, dumbbell</td><td>−57 LUFS</td></tr>
+  <tr><td class="mono">video_20260712_191942</td><td><b>Timbang stepper — 5.90kg</b></td><td>−57 LUFS</td></tr>
+  <tr><td class="mono">video_20260707_105155</td><td>Close-up lutut (knee sleeve)</td><td>−57 LUFS</td></tr>
+  <tr><td class="mono">video_20260707_105124 / _105102</td><td>Dumbbell depan TV (knee sleeve)</td><td>−57 LUFS</td></tr>
+</table>
+
+<h2>11. Semakan sebelum hantar</h2>
+<ul>
+  <li>☐ 1080×1920, 60fps, ≤70MB, tiada muzik latar</li>
+  <li>☐ (VO) Caption diluluskan; VO selari dengan asal (beza paras &lt;0.5 dB)</li>
+  <li>☐ Headline 100px, sub-headline 47px, caption 40px, <b>tiada tulisan &gt;100px</b></li>
+  <li>☐ Tiada tulisan terkeluar dari skrin / bertindih dengan grafik lain</li>
+  <li>☐ Frame akhir <b>setiap blok grafik</b> disemak — terutama <b>CTA</b></li>
+  <li>☐ Angka anggaran ditanda "*Anggaran"; fakta Internet ada sumber</li>
+  <li>☐ Teks tambahan (bukan dari brief) disenaraikan kepada pengguna</li>
+</ul>
+
+<h2>12. Templat brief (salin &amp; isi)</h2>
+<div class="two">
+<div>
+<p class="k">A · Ada voiceover</p>
+<pre>Link VO: …
+Link footage: https://drive.google.com/drive/folders/…
+
+Edit video ni guna Hyperframes.
+Buat transkrip, buang bahagian tak perlu,
+tambah motion graphics, captions, overlay,
+sound effect &amp; hook yang menarik.
+
+Gunakan updated format.
+Sebelum finalize, saya nak semak caption dulu.
+(Pilihan) Sebelum render final, saya nak
+check draf dulu.
+(Pilihan) Ubah shot berbanding video sebelum ni.</pre>
+</div>
+<div>
+<p class="k">B · Tanpa voiceover</p>
+<pre>Link footage: https://drive.google.com/drive/folders/…
+
+Edit video ni guna Hyperframes.
+Buat transkrip, buang bahagian tak perlu,
+tambah motion graphics, sound effect &amp; hook.
+
+Hook: …
+Mini hook (pilihan): …
+Education:
+ 1. … (durasi, cth. 10 saat)
+ 2. …
+USP: …
+CTA: …
+
+Gunakan updated format.
+(Pilihan) Terus mula dengan …
+(Pilihan) Infografik kurangkan X%</pre>
+</div>
+</div>
+
+<div class="footer">Format Edit Video V-Stepper · disusun daripada Task 1–18 · fail sumber projek: STYLE.md, scripts/ (footage_gain.py, render_70mb.sh, gen*.py)</div>
+</body>
+</html>
