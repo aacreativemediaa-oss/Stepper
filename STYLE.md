@@ -27,7 +27,7 @@ Rujukan tetap untuk setiap video baru. Kemas kini terakhir: sebelum Task 14.
 |---|---|
 | Headline | **100px** |
 | Sub-headline / pelekat save | **47px** |
-| Caption | **40px** (stroke hitam ~3–4px) |
+| Caption | **40px** (stroke hitam ~3–4px), kedudukan **y = 1450px** (mulai Task 20) |
 | Nombor heart rate | **64px** |
 | Chip, nama warna, label zon | **19px** |
 
@@ -36,7 +36,7 @@ Saiz lama (Task 4–13): headline 150px, sub headline 70px, caption 65px → 60p
 
 ## Teks & caption
 - Font: **Anton** (headline/caption), **Montserrat** 800/900 (label/pill).
-- Caption: huruf besar, 2–3 perkataan setiap paparan, perkataan aktif jadi **kuning**, kata kunci jadi **hijau neon**, di tengah bawah.
+- Caption: huruf besar, 2–3 perkataan setiap paparan, perkataan aktif jadi **kuning**, kata kunci jadi **hijau neon**, di tengah, **y = 1450px** dari atas (dulu 1150px).
 - **Jangan bertindih:** kalau grafik dah tunjuk klausa yang sama, caption untuk klausa itu disembunyikan (ikut klausa penuh; sembunyi jika ≥1/3 perkataan utama ada dalam grafik).
 - Ejaan tetap: **gelebeh**, **beg kuning**, **raya**, **briskwalk**.
 - Hook: headline besar + sub-headline atas blok berwarna, dengan bunyi impact + gegar skrin.
