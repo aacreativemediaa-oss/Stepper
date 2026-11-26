@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Anton"; src: url("assets/fonts/anton-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+      @font-face { font-family: "Mont"; src: url("assets/fonts/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+      @font-face { font-family: "Mont"; src: url("assets/fonts/montserrat-latin-900-normal.woff2") format("woff2"); font-weight: 900; }
+      :root { --ground: #000; --ink: #fff; --pink: #ff2e7e; --lime: #c6ff00; --yellow: #ffd400; --red: #ff3b30;
+              --font-display: "Anton", sans-serif; --font-ui: "Mont", sans-serif; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--font-display); color: var(--ink); }
+      .bg { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; transform-origin: 50% 45%; }
+      .layer { position: absolute; inset: 0; pointer-events: none; }
+      #vignette { background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%),
+                  linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.45) 100%); }
+      #flash { background: #fff; opacity: 0; }
+      #progress { position: absolute; left: 0; top: 0; height: 12px; width: 1080px; background: linear-gradient(90deg, var(--pink), var(--lime)); transform-origin: 0 50%; transform: scaleX(0); }
+
+      .g { position: absolute; left: 0; right: 0; text-align: center; }
+      .big { display: block; font-size: 100px; line-height: 0.95; -webkit-text-stroke: 8px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+      .mid { display: block; font-size: 77px; line-height: 1; -webkit-text-stroke: 7px #000; paint-order: stroke fill; text-shadow: 0 8px 0 #000; }
+      .blk { display: inline-block; margin-top: 16px; font-size: 98px; line-height: 0.95; padding: 8px 34px 2px; color: #000; background: var(--lime);
+             transform: rotate(-3deg); box-shadow: 0 14px 0 #000; white-space: nowrap; }
+      .blk.pink { background: var(--pink); color: #fff; }
+      .blk.yellow { background: var(--yellow); }
+      .tagline { display: inline-block; font-family: var(--font-ui); font-weight: 900; font-size: 34px; letter-spacing: 0.1em; padding: 10px 26px;
+                 border-radius: 999px; background: #000; color: var(--lime); margin-bottom: 18px; }
+      .pill { display: inline-flex; align-items: center; gap: 16px; padding: 16px 30px; border-radius: 999px; font-family: var(--font-ui);
+              font-weight: 900; font-size: 41px; color: #000; background: #fff; box-shadow: 0 12px 0 rgba(0,0,0,0.35); white-space: nowrap; }
+      .pill svg { width: 45px; height: 45px; }
+      .pill.lime { background: var(--lime); } .pill.pink { background: var(--pink); color: #fff; } .pill.yellow { background: var(--yellow); }
+
+      #hook { top: 470px; }
+      #edu1 { top: 300px; }
+      #edu2 { top: 300px; }
+      #edu2 .strike { position: absolute; left: 50%; top: 150px; width: 0; height: 18px; margin-left: -330px; background: var(--red); transform: rotate(-4deg); border-radius: 9px; box-shadow: 0 6px 0 #000; }
+      #edu3 { top: 260px; }
+      #parts { left: 70px; right: auto; top: 640px; display: flex; flex-direction: column; gap: 24px; align-items: flex-start; }
+      #usp1 { top: 260px; }
+      #gauge { position: relative; width: 420px; height: 260px; margin: 10px auto 0; }
+      #gauge svg { position: absolute; inset: 0; }
+      #gauge .num { position: absolute; left: 0; right: 0; top: 92px; font-size: 100px; line-height: 1; -webkit-text-stroke: 8px #000; paint-order: stroke fill; color: var(--lime); }
+      #gauge .num small { font-size: 60px; color: #fff; }
+      #usp2 { top: 300px; }
+      #price { top: 260px; }
+      #price .tagbox { display: inline-block; padding: 26px 56px 18px; background: var(--yellow); color: #000; border-radius: 26px; box-shadow: 0 16px 0 #000; transform-origin: 50% -40px; }
+      #price .tagbox .s { font-family: var(--font-ui); font-weight: 900; font-size: 36px; letter-spacing: 0.1em; }
+      #price .tagbox .m { font-size: 100px; line-height: 0.95; }
+      #cta { top: 260px; }
+      #cta .card { display: inline-block; padding: 30px 50px 34px; border-radius: 36px; background: #fff; color: #000; box-shadow: 0 18px 0 rgba(0,0,0,0.45); }
+      #cta .card .a { font-family: var(--font-ui); font-weight: 900; font-size: 34px; color: var(--pink); letter-spacing: 0.06em; }
+      #cta .card .b { font-size: 100px; line-height: 0.95; }
+      #cta .bag { margin-top: 26px; display: inline-flex; align-items: center; gap: 18px; padding: 16px 36px; border-radius: 999px; background: var(--yellow);
+                  font-family: var(--font-ui); font-weight: 900; font-size: 44px; color: #000; box-shadow: 0 12px 0 #000; }
+      #cta .bag svg { width: 62px; height: 62px; }
+      #arrows { left: 120px; right: auto; top: 1430px; display: flex; flex-direction: column; align-items: center; }
+      #arrows svg { width: 150px; height: 90px; margin-top: -20px; }
+
+      .row { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-top: 24px; padding: 0 60px; }
+      .num { display: inline-flex; align-items: center; justify-content: center; width: 150px; height: 150px; border-radius: 50%; background: var(--pink);
+             border: 8px solid #000; box-shadow: 0 12px 0 #000; font-size: 100px; color: #fff; -webkit-text-stroke: 6px #000; paint-order: stroke fill; margin-bottom: 14px; }
+      .cara { font-family: var(--font-ui); font-weight: 900; font-size: 34px; letter-spacing: 0.12em; color: var(--lime); }
+      #muscle { width: 220px; height: 190px; display: block; margin: 0 auto 6px; }
+      .icon { width: 190px; height: 170px; display: block; margin: 0 auto 6px; }
+      .stat { display: inline-flex; gap: 26px; align-items: stretch; margin-top: 22px; }
+      .stat .box { background: rgba(0,0,0,0.78); border: 5px solid var(--lime); border-radius: 26px; padding: 14px 30px 10px; min-width: 250px; }
+      .stat .box b { display: block; font-weight: 400; font-size: 100px; line-height: 1; color: var(--lime); font-variant-numeric: tabular-nums; }
+      .stat .box i { font-style: normal; font-family: var(--font-ui); font-weight: 900; font-size: 30px; letter-spacing: 0.1em; color: #fff; }
+      .stat .eq { align-self: center; font-size: 90px; color: #fff; -webkit-text-stroke: 6px #000; paint-order: stroke fill; }
+      #bm { width: 120px; height: 150px; display: block; margin: 0 auto 10px; }
+      #cal { position: relative; width: 340px; height: 360px; margin: 0 auto; perspective: 900px; }
+      #cal .card { position: absolute; inset: 0; border-radius: 28px; background: #fff; box-shadow: 0 16px 0 #000; overflow: hidden; border: 6px solid #000; }
+      #cal .hdr { height: 92px; background: var(--red); border-bottom: 6px solid #000; color: #fff; font-family: var(--font-ui); font-weight: 900; font-size: 40px; letter-spacing: 0.12em; line-height: 92px; }
+      #cal .yr { font-size: 100px; line-height: 1; margin-top: 40px; color: #000; }
+      #cal .page { transform-origin: 50% 0; backface-visibility: hidden; }
+      #cal .rings { position: absolute; left: 0; right: 0; top: -24px; display: flex; justify-content: space-around; padding: 0 60px; z-index: 3; }
+      #cal .rings i { width: 22px; height: 56px; border-radius: 11px; background: #333; border: 5px solid #000; }
+
+      #table { left: 60px; right: 60px; top: 520px; background: rgba(10,10,12,0.86); border: 6px solid #000; border-radius: 34px;
+               box-shadow: 0 16px 0 #000; padding: 26px 34px 20px; text-align: left; }
+      #table .hdr { display: flex; justify-content: space-between; font-family: var(--font-ui); font-weight: 900; font-size: 28px; letter-spacing: 0.1em; color: #9aa; padding: 0 4px 10px; border-bottom: 3px solid #333; }
+      .trow { display: flex; align-items: center; gap: 18px; height: 112px; border-bottom: 3px dashed #2a2a2a; }
+      .trow:last-child { border-bottom: 0; }
+      .trow .kg { width: 190px; font-size: 76px; line-height: 1; color: #fff; }
+      .trow .bar { flex: 1; height: 44px; background: #222; border-radius: 22px; overflow: hidden; border: 3px solid #000; }
+      .trow .bar i { display: block; height: 100%; border-radius: 22px; background: linear-gradient(90deg, var(--lime), var(--yellow)); transform-origin: 0 50%; }
+      .trow .kc { width: 220px; text-align: right; font-size: 76px; line-height: 1; color: var(--yellow); }
+      .trow .kc small { font-family: var(--font-ui); font-weight: 900; font-size: 24px; color: #fff; margin-left: 6px; }
+      .trow.top .kg, .trow.top .kc { color: var(--pink); }
+      #note { top: 1325px; } #note span { font-family: var(--font-ui); font-weight: 800; font-size: 28px; color: #fff; background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 999px; }
+      #watch { width: 150px; height: 170px; display: block; margin: 0 auto 6px; }
+      #muscles { left: 50px; right: 50px; top: 400px; background: rgba(10,10,12,0.86); border: 6px solid #000; border-radius: 34px; box-shadow: 0 16px 0 #000; padding: 22px 20px 26px; }
+      #muscles .figs { display: flex; justify-content: space-around; }
+      #muscles .fig { text-align: center; font-family: var(--font-ui); font-weight: 900; font-size: 28px; letter-spacing: 0.12em; color: #9aa; }
+      #muscles .fig svg { width: 300px; height: 520px; display: block; }
+      #mpills { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 18px; }
+      #mpills .pill { font-size: 36px; padding: 12px 24px; }
+      .tipttl { display: flex; align-items: center; justify-content: center; gap: 18px; }
+      .tipttl .num { margin-bottom: 0; width: 130px; height: 130px; font-size: 86px; }
+      .ill { display: block; margin: 18px auto 0; }
+      #shoe { width: 560px; height: 300px; }
+      #steps3 { display: flex; justify-content: center; align-items: flex-end; gap: 26px; height: 430px; margin-top: 26px; }
+      .col { width: 230px; text-align: center; }
+      .col .bar { border: 6px solid #000; border-radius: 22px 22px 8px 8px; box-shadow: 0 12px 0 #000; transform-origin: 50% 100%;
+                  display: flex; flex-direction: column; justify-content: flex-start; padding-top: 14px; }
+      .col .bar b { font-weight: 400; font-size: 76px; line-height: 1; color: #000; }
+      .col .bar i { font-style: normal; font-family: var(--font-ui); font-weight: 900; font-size: 26px; color: #000; }
+      .col .wk { font-family: var(--font-ui); font-weight: 900; font-size: 30px; letter-spacing: 0.06em; color: #fff; margin-top: 14px;
+                 background: rgba(0,0,0,0.75); border-radius: 999px; padding: 6px 0; }
+      #db { width: 520px; height: 230px; }
+      .num.red { background: var(--red); }
+      #warn { width: 230px; height: 200px; display: block; margin: 0 auto 10px; }
+      #foot { width: 420px; height: 300px; }
+      #gauge { width: 470px; height: 290px; }
+      #week { display: flex; justify-content: center; gap: 12px; margin-top: 28px; }
+      .day { width: 118px; text-align: center; background: rgba(0,0,0,0.78); border: 5px solid #000; border-radius: 18px; padding: 8px 0 6px; }
+      .day i { display: block; font-style: normal; font-family: var(--font-ui); font-weight: 900; font-size: 24px; color: #9aa; }
+      .day b { display: block; font-weight: 400; font-size: 66px; line-height: 1.1; }
+      .day.ok b { color: var(--lime); } .day.no b { color: var(--red); }
+      #prog { width: 760px; height: 46px; margin: 26px auto 0; background: rgba(0,0,0,0.75); border: 5px solid #000; border-radius: 23px; overflow: hidden; }
+      #prog i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--red), var(--yellow)); transform-origin: 0 50%; }
+      .fix { margin-top: 22px; }
+      .bignum { display: block; font-size: 100px; line-height: 1; color: var(--lime); -webkit-text-stroke: 7px #000; paint-order: stroke fill; text-shadow: 0 10px 0 #000; }
+      .src { margin-top: 14px; font-family: var(--font-ui); font-weight: 800; font-size: 22px; color: #fff; opacity: 0.85; text-shadow: 0 2px 0 #000; }
+      .panel { left: 40px; right: 40px; background: rgba(10,10,12,0.88); border: 6px solid #000; border-radius: 34px; box-shadow: 0 16px 0 #000; padding: 24px 22px; }
+      .cols { display: flex; gap: 18px; }
+      .col2 { flex: 1; text-align: center; }
+      .col2 h3 { font-family: var(--font-display); font-weight: 400; font-size: 56px; line-height: 1; margin-bottom: 10px; -webkit-text-stroke: 4px #000; paint-order: stroke fill; }
+      .col2 .ic { width: 230px; height: 230px; display: block; margin: 0 auto 10px; }
+      .col2 .pl { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+      .col2 .pill { font-size: 27px; padding: 10px 18px; gap: 10px; }
+      .col2 .pill svg { width: 32px; height: 32px; }
+      .vsb { align-self: center; width: 96px; height: 96px; border-radius: 50%; background: var(--red); border: 6px solid #000; box-shadow: 0 8px 0 #000;
+             display: flex; align-items: center; justify-content: center; font-size: 50px; color: #fff; -webkit-text-stroke: 4px #000; paint-order: stroke fill; flex: none; }
+      .thead { display: flex; font-family: var(--font-ui); font-weight: 900; font-size: 24px; letter-spacing: 0.08em; color: #9aa; padding: 0 6px 10px; border-bottom: 3px solid #333; }
+      .thead span:nth-child(1) { width: 150px; } .thead span:nth-child(2), .thead span:nth-child(3) { flex: 1; text-align: center; }
+      .crow { display: flex; align-items: center; height: 104px; border-bottom: 3px dashed #2a2a2a; padding: 0 6px; }
+      .crow:last-child { border-bottom: 0; }
+      .crow .kg { width: 150px; font-size: 58px; color: #fff; }
+      .crow .c { flex: 1; display: flex; align-items: center; gap: 10px; padding: 0 8px; }
+      .crow .bar { flex: 1; height: 30px; background: #222; border-radius: 15px; border: 3px solid #000; overflow: hidden; }
+      .crow .bar i { display: block; height: 100%; border-radius: 15px; transform-origin: 0 50%; }
+      .crow .v { width: 88px; text-align: right; font-size: 50px; line-height: 1; }
+      .note { margin-top: 12px; font-family: var(--font-ui); font-weight: 800; font-size: 20px; color: #ccc; text-align: center; }
+      .figs4 { display: flex; justify-content: space-around; }
+      .figs4 svg { width: 200px; height: 420px; display: block; }
+      .figlab { font-family: var(--font-ui); font-weight: 900; font-size: 22px; letter-spacing: 0.1em; color: #9aa; text-align: center; }
+      .tipbadge { display: inline-block; font-family: var(--font-ui); font-weight: 900; font-size: 34px; letter-spacing: 0.14em; color: #000; background: var(--yellow);
+                  padding: 8px 26px; border-radius: 999px; border: 5px solid #000; box-shadow: 0 8px 0 #000; }
+      #shoe { width: 520px; height: 280px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="44.0" data-width="1080" data-height="1920">
+      <video class="clip bg" id="v0" src="assets/video/f8.mp4" playsinline data-has-audio="true" data-volume="0.0422" data-start="0.00" data-duration="3.50" data-media-start="3.00" data-track-index="1"></video>
+      <video class="clip bg" id="v1" src="assets/video/f19.mp4" playsinline data-has-audio="true" data-volume="0.0923" data-start="3.50" data-duration="8.00" data-media-start="1.00" data-track-index="1"></video>
+      <video class="clip bg" id="v2" src="assets/video/f7.mp4" playsinline data-has-audio="true" data-volume="0.0313" data-start="11.50" data-duration="7.00" data-media-start="3.00" data-track-index="1"></video>
+      <video class="clip bg" id="v3" src="assets/video/f3.mp4" playsinline data-has-audio="true" data-volume="0.0288" data-start="18.50" data-duration="6.00" data-media-start="2.00" data-track-index="1"></video>
+      <video class="clip bg" id="v4" src="assets/video/f13.mp4" playsinline data-has-audio="true" data-volume="0.2818" data-start="24.50" data-duration="5.00" data-media-start="1.00" data-track-index="1"></video>
+      <video class="clip bg" id="v5" src="assets/video/f5.mp4" muted playsinline data-start="29.50" data-duration="3.50" data-media-start="50.90" data-track-index="1"></video>
+      <video class="clip bg" id="v6" src="assets/video/f16.mp4" playsinline data-has-audio="true" data-volume="1.0116" data-start="33.00" data-duration="4.00" data-media-start="2.90" data-track-index="1"></video>
+      <video class="clip bg" id="v7" src="assets/video/f15.mp4" playsinline data-has-audio="true" data-volume="0.9772" data-start="37.00" data-duration="3.00" data-media-start="2.00" data-track-index="1"></video>
+      <video class="clip bg" id="v8" src="assets/video/f18.mp4" playsinline data-has-audio="true" data-volume="0.0966" data-start="40.00" data-duration="4.00" data-media-start="4.00" data-track-index="1"></video>
+      <audio class="sfx" id="s0" src="assets/sfx/whoosh.wav" data-start="0.05" data-duration="0.45" data-volume="0.0525" data-track-index="30"></audio>
+      <audio class="sfx" id="s1" src="assets/sfx/swoosh.wav" data-start="0.35" data-duration="0.35" data-volume="0.0525" data-track-index="31"></audio>
+      <audio class="sfx" id="s2" src="assets/sfx/impact.wav" data-start="0.65" data-duration="0.90" data-volume="0.0825" data-track-index="32"></audio>
+      <audio class="sfx" id="s3" src="assets/sfx/pop.wav" data-start="1.20" data-duration="0.12" data-volume="0.06" data-track-index="33"></audio>
+      <audio class="sfx" id="s4" src="assets/sfx/whoosh.wav" data-start="3.50" data-duration="0.45" data-volume="0.0525" data-track-index="30"></audio>
+      <audio class="sfx" id="s5" src="assets/sfx/pop.wav" data-start="3.55" data-duration="0.12" data-volume="0.06" data-track-index="31"></audio>
+      <audio class="sfx" id="s6" src="assets/sfx/whoosh.wav" data-start="11.50" data-duration="0.45" data-volume="0.0525" data-track-index="32"></audio>
+      <audio class="sfx" id="s7" src="assets/sfx/pop.wav" data-start="11.55" data-duration="0.12" data-volume="0.06" data-track-index="33"></audio>
+      <audio class="sfx" id="s8" src="assets/sfx/whoosh.wav" data-start="18.50" data-duration="0.45" data-volume="0.0525" data-track-index="30"></audio>
+      <audio class="sfx" id="s9" src="assets/sfx/pop.wav" data-start="18.55" data-duration="0.12" data-volume="0.06" data-track-index="31"></audio>
+      <audio class="sfx" id="s10" src="assets/sfx/whoosh.wav" data-start="24.50" data-duration="0.45" data-volume="0.0525" data-track-index="32"></audio>
+      <audio class="sfx" id="s11" src="assets/sfx/pop.wav" data-start="24.55" data-duration="0.12" data-volume="0.06" data-track-index="33"></audio>
+      <audio class="sfx" id="s12" src="assets/sfx/pop.wav" data-start="4.10" data-duration="0.12" data-volume="0.045" data-track-index="30"></audio>
+      <audio class="sfx" id="s13" src="assets/sfx/pop.wav" data-start="4.90" data-duration="0.12" data-volume="0.045" data-track-index="31"></audio>
+      <audio class="sfx" id="s14" src="assets/sfx/pop.wav" data-start="5.70" data-duration="0.12" data-volume="0.045" data-track-index="32"></audio>
+      <audio class="sfx" id="s15" src="assets/sfx/pop.wav" data-start="6.50" data-duration="0.12" data-volume="0.045" data-track-index="33"></audio>
+      <audio class="sfx" id="s16" src="assets/sfx/pop.wav" data-start="7.30" data-duration="0.12" data-volume="0.045" data-track-index="30"></audio>
+      <audio class="sfx" id="s17" src="assets/sfx/pop.wav" data-start="8.10" data-duration="0.12" data-volume="0.045" data-track-index="31"></audio>
+      <audio class="sfx" id="s18" src="assets/sfx/impact.wav" data-start="9.50" data-duration="0.90" data-volume="0.0675" data-track-index="32"></audio>
+      <audio class="sfx" id="s19" src="assets/sfx/ding.wav" data-start="9.60" data-duration="1.20" data-volume="0.045" data-track-index="33"></audio>
+      <audio class="sfx" id="s20" src="assets/sfx/riser.wav" data-start="12.30" data-duration="1.20" data-volume="0.0375" data-track-index="30"></audio>
+      <audio class="sfx" id="s21" src="assets/sfx/pop.wav" data-start="12.90" data-duration="0.12" data-volume="0.045" data-track-index="31"></audio>
+      <audio class="sfx" id="s22" src="assets/sfx/pop.wav" data-start="13.30" data-duration="0.12" data-volume="0.045" data-track-index="32"></audio>
+      <audio class="sfx" id="s23" src="assets/sfx/pop.wav" data-start="13.90" data-duration="0.12" data-volume="0.045" data-track-index="33"></audio>
+      <audio class="sfx" id="s24" src="assets/sfx/pop.wav" data-start="14.30" data-duration="0.12" data-volume="0.045" data-track-index="30"></audio>
+      <audio class="sfx" id="s25" src="assets/sfx/ding.wav" data-start="14.90" data-duration="1.20" data-volume="0.0375" data-track-index="31"></audio>
+      <audio class="sfx" id="s26" src="assets/sfx/impact.wav" data-start="19.00" data-duration="0.90" data-volume="0.0525" data-track-index="32"></audio>
+      <audio class="sfx" id="s27" src="assets/sfx/pop.wav" data-start="19.70" data-duration="0.12" data-volume="0.045" data-track-index="33"></audio>
+      <audio class="sfx" id="s28" src="assets/sfx/pop.wav" data-start="20.25" data-duration="0.12" data-volume="0.045" data-track-index="30"></audio>
+      <audio class="sfx" id="s29" src="assets/sfx/pop.wav" data-start="20.80" data-duration="0.12" data-volume="0.045" data-track-index="31"></audio>
+      <audio class="sfx" id="s30" src="assets/sfx/pop.wav" data-start="21.35" data-duration="0.12" data-volume="0.045" data-track-index="32"></audio>
+      <audio class="sfx" id="s31" src="assets/sfx/pop.wav" data-start="21.90" data-duration="0.12" data-volume="0.045" data-track-index="33"></audio>
+      <audio class="sfx" id="s32" src="assets/sfx/pop.wav" data-start="22.45" data-duration="0.12" data-volume="0.045" data-track-index="30"></audio>
+      <audio class="sfx" id="s33" src="assets/sfx/swoosh.wav" data-start="25.20" data-duration="0.35" data-volume="0.045" data-track-index="31"></audio>
+      <audio class="sfx" id="s34" src="assets/sfx/impact.wav" data-start="25.65" data-duration="0.90" data-volume="0.0525" data-track-index="32"></audio>
+      <audio class="sfx" id="s35" src="assets/sfx/pop.wav" data-start="26.80" data-duration="0.12" data-volume="0.06" data-track-index="33"></audio>
+      <audio class="sfx" id="s36" src="assets/sfx/whoosh.wav" data-start="29.50" data-duration="0.45" data-volume="0.0525" data-track-index="30"></audio>
+      <audio class="sfx" id="s37" src="assets/sfx/ding.wav" data-start="29.85" data-duration="1.20" data-volume="0.045" data-track-index="31"></audio>
+      <audio class="sfx" id="s38" src="assets/sfx/pop.wav" data-start="30.80" data-duration="0.12" data-volume="0.0525" data-track-index="32"></audio>
+      <audio class="sfx" id="s39" src="assets/sfx/pop.wav" data-start="31.20" data-duration="0.12" data-volume="0.0525" data-track-index="33"></audio>
+      <audio class="sfx" id="s40" src="assets/sfx/pop.wav" data-start="31.60" data-duration="0.12" data-volume="0.0525" data-track-index="30"></audio>
+      <audio class="sfx" id="s41" src="assets/sfx/whoosh.wav" data-start="33.00" data-duration="0.45" data-volume="0.0525" data-track-index="31"></audio>
+      <audio class="sfx" id="s42" src="assets/sfx/pop.wav" data-start="33.25" data-duration="0.12" data-volume="0.06" data-track-index="32"></audio>
+      <audio class="sfx" id="s43" src="assets/sfx/ding.wav" data-start="33.80" data-duration="1.20" data-volume="0.045" data-track-index="33"></audio>
+      <audio class="sfx" id="s44" src="assets/sfx/whoosh.wav" data-start="37.00" data-duration="0.45" data-volume="0.0525" data-track-index="30"></audio>
+      <audio class="sfx" id="s45" src="assets/sfx/swoosh.wav" data-start="37.50" data-duration="0.35" data-volume="0.0525" data-track-index="31"></audio>
+      <audio class="sfx" id="s46" src="assets/sfx/impact.wav" data-start="38.30" data-duration="0.90" data-volume="0.0675" data-track-index="32"></audio>
+      <audio class="sfx" id="s47" src="assets/sfx/whoosh.wav" data-start="40.00" data-duration="0.45" data-volume="0.0525" data-track-index="33"></audio>
+      <audio class="sfx" id="s48" src="assets/sfx/pop.wav" data-start="40.10" data-duration="0.12" data-volume="0.06" data-track-index="30"></audio>
+      <audio class="sfx" id="s49" src="assets/sfx/ding.wav" data-start="40.70" data-duration="1.20" data-volume="0.045" data-track-index="31"></audio>
+      <div id="vignette" class="layer"></div>
+
+      <!-- HOOK: headline 100px, sub-headline 47px -->
+      <div id="hook" class="g clip" data-start="0" data-duration="3.5" data-track-index="10" style="top:400px">
+        <span class="big" id="h1" style="font-size:100px;color:var(--lime)">STEPPER</span>
+        <div class="vsb" id="hvs" style="margin:14px auto">VS</div>
+        <span class="big" id="h1b" style="font-size:100px;color:#fff">BRISKWALK</span>
+        <span class="blk pink" id="h2" style="font-size:47px;margin-top:22px">MANA LAGI BERKESAN?</span>
+      </div>
+
+      <!-- EDU 1: kalori 15 minit -->
+      <div id="e1t" class="g clip" data-start="3.55" data-duration="7.95" data-track-index="10" style="top:200px">
+        <span class="blk" id="e1h" style="font-size:47px">① KALORI DALAM 15 MINIT</span>
+      </div>
+      <div id="e1" class="g clip panel" data-start="3.70" data-duration="7.80" data-track-index="11" style="top:310px">
+        <div class="thead"><span>BERAT</span><span style="color:var(--lime)">STEPPER</span><span>BRISKWALK</span></div>
+        <div class="crow" id="cr0"><span class="kg">50KG</span>
+          <span class="c"><span class="bar"><i id="sb0" style="width:47.6%;background:linear-gradient(90deg,var(--lime),var(--yellow))"></i></span><span class="v" style="color:var(--lime)">150</span></span>
+          <span class="c"><span class="bar"><i id="bb0" style="width:20.0%;background:#9aa"></i></span><span class="v" style="color:#ddd">63</span></span></div><div class="crow" id="cr1"><span class="kg">60KG</span>
+          <span class="c"><span class="bar"><i id="sb1" style="width:57.1%;background:linear-gradient(90deg,var(--lime),var(--yellow))"></i></span><span class="v" style="color:var(--lime)">180</span></span>
+          <span class="c"><span class="bar"><i id="bb1" style="width:24.1%;background:#9aa"></i></span><span class="v" style="color:#ddd">76</span></span></div><div class="crow" id="cr2"><span class="kg">70KG</span>
+          <span class="c"><span class="bar"><i id="sb2" style="width:66.7%;background:linear-gradient(90deg,var(--lime),var(--yellow))"></i></span><span class="v" style="color:var(--lime)">210</span></span>
+          <span class="c"><span class="bar"><i id="bb2" style="width:27.9%;background:#9aa"></i></span><span class="v" style="color:#ddd">88</span></span></div><div class="crow" id="cr3"><span class="kg">80KG</span>
+          <span class="c"><span class="bar"><i id="sb3" style="width:76.2%;background:linear-gradient(90deg,var(--lime),var(--yellow))"></i></span><span class="v" style="color:var(--lime)">240</span></span>
+          <span class="c"><span class="bar"><i id="bb3" style="width:32.1%;background:#9aa"></i></span><span class="v" style="color:#ddd">101</span></span></div><div class="crow" id="cr4"><span class="kg">90KG</span>
+          <span class="c"><span class="bar"><i id="sb4" style="width:85.7%;background:linear-gradient(90deg,var(--lime),var(--yellow))"></i></span><span class="v" style="color:var(--lime)">270</span></span>
+          <span class="c"><span class="bar"><i id="bb4" style="width:35.9%;background:#9aa"></i></span><span class="v" style="color:#ddd">113</span></span></div><div class="crow" id="cr5"><span class="kg">100KG</span>
+          <span class="c"><span class="bar"><i id="sb5" style="width:100.0%;background:linear-gradient(90deg,var(--lime),var(--yellow))"></i></span><span class="v" style="color:var(--lime)">315</span></span>
+          <span class="c"><span class="bar"><i id="bb5" style="width:40.0%;background:#9aa"></i></span><span class="v" style="color:#ddd">126</span></span></div>
+        <div class="note" id="e1n">*Anggaran. Stepper: jadual rujukan ×1.5. Briskwalk: MET 4.8 (Compendium 2024).</div>
+      </div>
+      <div id="e1c" class="g clip" data-start="9.50" data-duration="2.00" data-track-index="12" style="top:1290px">
+        <span class="blk pink" id="e1x" style="font-size:66px">STEPPER ±2.4X LEBIH BANYAK!</span>
+      </div>
+
+      <!-- EDU 2: otot & koordinasi -->
+      <div id="e2t" class="g clip" data-start="11.55" data-duration="6.95" data-track-index="10" style="top:200px">
+        <span class="blk" id="e2h" style="font-size:47px">② OTOT &amp; KOORDINASI</span>
+      </div>
+      <div id="e2" class="g clip panel" data-start="11.70" data-duration="6.80" data-track-index="11" style="top:310px">
+        <div class="cols">
+          <div class="col2"><h3 style="color:var(--lime)">STEPPER</h3>
+            <div class="figs4"><div><svg viewBox="0 0 200 420"><g fill="#3d3d44" stroke="#000" stroke-width="5" stroke-linejoin="round">
+  <circle cx="100" cy="40" r="28"/><rect x="88" y="64" width="24" height="18"/>
+  <path d="M55 85 Q100 74 145 85 L140 215 Q100 230 60 215 Z"/>
+  <path d="M55 90 L32 100 L20 210 L36 214 L52 122 Z"/><path d="M145 90 L168 100 L180 210 L164 214 L148 122 Z"/>
+  <path d="M20 210 L14 292 L30 294 L36 214 Z"/><path d="M180 210 L186 292 L170 294 L164 214 Z"/>
+  <path d="M60 215 Q100 232 140 215 L142 252 L58 252 Z"/>
+  <path d="M58 252 L98 252 L95 340 L92 412 L68 412 L63 340 Z"/><path d="M102 252 L142 252 L137 340 L132 412 L108 412 L105 340 Z"/>
+</g><g class="hl" id="s1" fill="#c6ff00" stroke="#000" stroke-width="3"><ellipse cx="54" cy="99" rx="15" ry="13"/><ellipse cx="146" cy="99" rx="15" ry="13"/><ellipse cx="38" cy="152" rx="9" ry="26" transform="rotate(8 38 152)"/><ellipse cx="162" cy="152" rx="9" ry="26" transform="rotate(-8 162 152)"/><rect x="80" y="112" width="40" height="92" rx="12"/><ellipse cx="80" cy="292" rx="15" ry="38"/><ellipse cx="121" cy="292" rx="15" ry="38"/></g></svg><div class="figlab">DEPAN</div></div><div><svg viewBox="0 0 200 420"><g fill="#3d3d44" stroke="#000" stroke-width="5" stroke-linejoin="round">
+  <circle cx="100" cy="40" r="28"/><rect x="88" y="64" width="24" height="18"/>
+  <path d="M55 85 Q100 74 145 85 L140 215 Q100 230 60 215 Z"/>
+  <path d="M55 90 L32 100 L20 210 L36 214 L52 122 Z"/><path d="M145 90 L168 100 L180 210 L164 214 L148 122 Z"/>
+  <path d="M20 210 L14 292 L30 294 L36 214 Z"/><path d="M180 210 L186 292 L170 294 L164 214 Z"/>
+  <path d="M60 215 Q100 232 140 215 L142 252 L58 252 Z"/>
+  <path d="M58 252 L98 252 L95 340 L92 412 L68 412 L63 340 Z"/><path d="M102 252 L142 252 L137 340 L132 412 L108 412 L105 340 Z"/>
+</g><g class="hl" id="s2" fill="#c6ff00" stroke="#000" stroke-width="3"><ellipse cx="38" cy="152" rx="9" ry="26" transform="rotate(8 38 152)"/><ellipse cx="162" cy="152" rx="9" ry="26" transform="rotate(-8 162 152)"/><ellipse cx="81" cy="238" rx="19" ry="16"/><ellipse cx="119" cy="238" rx="19" ry="16"/><ellipse cx="80" cy="298" rx="14" ry="32"/><ellipse cx="121" cy="298" rx="14" ry="32"/><ellipse cx="79" cy="370" rx="10" ry="26"/><ellipse cx="120" cy="370" rx="10" ry="26"/></g></svg><div class="figlab">BELAKANG</div></div></div>
+            <div class="pl" style="margin-top:12px"><span class="pill lime" id="sm1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>PUNGGUNG, PEHA, BETIS</span><span class="pill lime" id="sm2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>CORE &amp; LENGAN*</span><span class="pill pink" id="sm3"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>KOORDINASI TANGAN–KAKI*</span><span class="pill pink" id="sm4"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>IMBANGAN BADAN</span></div></div>
+          <div class="col2"><h3 style="color:#fff">BRISKWALK</h3>
+            <div class="figs4"><div><svg viewBox="0 0 200 420"><g fill="#3d3d44" stroke="#000" stroke-width="5" stroke-linejoin="round">
+  <circle cx="100" cy="40" r="28"/><rect x="88" y="64" width="24" height="18"/>
+  <path d="M55 85 Q100 74 145 85 L140 215 Q100 230 60 215 Z"/>
+  <path d="M55 90 L32 100 L20 210 L36 214 L52 122 Z"/><path d="M145 90 L168 100 L180 210 L164 214 L148 122 Z"/>
+  <path d="M20 210 L14 292 L30 294 L36 214 Z"/><path d="M180 210 L186 292 L170 294 L164 214 Z"/>
+  <path d="M60 215 Q100 232 140 215 L142 252 L58 252 Z"/>
+  <path d="M58 252 L98 252 L95 340 L92 412 L68 412 L63 340 Z"/><path d="M102 252 L142 252 L137 340 L132 412 L108 412 L105 340 Z"/>
+</g><g class="hl" id="b1" fill="#ffd400" stroke="#000" stroke-width="3"><ellipse cx="80" cy="292" rx="15" ry="38"/><ellipse cx="121" cy="292" rx="15" ry="38"/></g></svg><div class="figlab">DEPAN</div></div><div><svg viewBox="0 0 200 420"><g fill="#3d3d44" stroke="#000" stroke-width="5" stroke-linejoin="round">
+  <circle cx="100" cy="40" r="28"/><rect x="88" y="64" width="24" height="18"/>
+  <path d="M55 85 Q100 74 145 85 L140 215 Q100 230 60 215 Z"/>
+  <path d="M55 90 L32 100 L20 210 L36 214 L52 122 Z"/><path d="M145 90 L168 100 L180 210 L164 214 L148 122 Z"/>
+  <path d="M20 210 L14 292 L30 294 L36 214 Z"/><path d="M180 210 L186 292 L170 294 L164 214 Z"/>
+  <path d="M60 215 Q100 232 140 215 L142 252 L58 252 Z"/>
+  <path d="M58 252 L98 252 L95 340 L92 412 L68 412 L63 340 Z"/><path d="M102 252 L142 252 L137 340 L132 412 L108 412 L105 340 Z"/>
+</g><g class="hl" id="b2" fill="#ffd400" stroke="#000" stroke-width="3"><ellipse cx="79" cy="370" rx="10" ry="26"/><ellipse cx="120" cy="370" rx="10" ry="26"/></g></svg><div class="figlab">BELAKANG</div></div></div>
+            <div class="pl" style="margin-top:12px"><span class="pill yellow" id="bm1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#ffd400" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>PEHA DEPAN &amp; BETIS</span><span class="pill" id="bm2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#fff"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>AYUNAN TANGAN BIASA</span></div></div>
+        </div>
+        <div class="note" id="e2n">*Bila guna tali resistance. Sumber: Women's Health, Peloton, Well+Good.</div>
+      </div>
+
+      <!-- EDU 3: ruang & peralatan -->
+      <div id="e3t" class="g clip" data-start="18.55" data-duration="5.95" data-track-index="10" style="top:200px">
+        <span class="blk" id="e3h" style="font-size:47px">③ RUANG &amp; PERALATAN</span>
+      </div>
+      <div id="e3" class="g clip panel" data-start="18.70" data-duration="5.80" data-track-index="11" style="top:310px">
+        <div class="cols">
+          <div class="col2"><h3 style="color:var(--lime)">STEPPER</h3><svg class="ic" id="stepi2" viewBox="0 0 230 230"><circle cx="115" cy="115" r="108" fill="#2a2a30" stroke="#000" stroke-width="6"/>
+  <g id="pedL2"><rect x="40" y="118" width="64" height="18" rx="5" fill="#ff3b30" stroke="#000" stroke-width="4"/></g>
+  <g id="pedR2"><rect x="126" y="118" width="64" height="18" rx="5" fill="#ff3b30" stroke="#000" stroke-width="4"/></g>
+  <path d="M72 136 L115 176 L158 136" stroke="#888" stroke-width="10" fill="none"/><rect x="60" y="172" width="110" height="16" rx="6" fill="#000"/>
+  <g stroke="#c6ff00" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M115 36 V96"/><path d="M98 52 L115 36 L132 52"/><path d="M98 80 L115 96 L132 80"/></g></svg>
+            <div class="pl"><span class="pill lime" id="sr1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>MUAT DALAM BILIK</span><span class="pill lime" id="sr2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>TAK KIRA CUACA</span><span class="pill lime" id="sr3"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>STEPPER + KASUT</span></div></div>
+          <div class="vsb" id="e3vs">VS</div>
+          <div class="col2"><h3 style="color:#fff">BRISKWALK</h3><svg class="ic" id="walker2" viewBox="0 0 230 230"><circle cx="115" cy="115" r="108" fill="#2a2a30" stroke="#000" stroke-width="6"/>
+  <g stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <circle cx="122" cy="48" r="16" fill="#fff" stroke="none"/>
+    <path d="M118 72 L108 124"/><path d="M114 84 L86 104 M114 84 L140 106"/>
+    <path id="wlegA2" d="M108 124 L90 168 L76 192"/><path id="wlegB2" d="M108 124 L128 162 L150 180"/></g>
+  <path id="warr2" d="M40 214 H190 M172 200 L190 214 L172 228" stroke="#ffd400" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="pl"><span class="pill" id="br1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#fff"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>PERLU LALUAN / TREK</span><span class="pill" id="br2" style="background:#ffd5d0"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M20 20 L44 44 M44 20 L20 44" stroke="#ff3b30" stroke-width="8" stroke-linecap="round"/></svg>IKUT CUACA</span><span class="pill" id="br3"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#fff"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>KASUT SUKAN</span></div></div>
+        </div>
+      </div>
+
+      <!-- TIPS -->
+      <div id="tip" class="g clip" data-start="24.55" data-duration="4.95" data-track-index="10" style="top:240px">
+        <span class="tipbadge" id="tb">TIPS</span>
+        <span class="blk" id="tt" style="font-size:66px;margin-top:22px">PAKAI KASUT BILA GUNA STEPPER</span>
+        <svg id="shoe" class="ill" viewBox="0 0 280 150">
+  <g id="ripples" fill="none" stroke="#ff3b30" stroke-width="6" stroke-linecap="round">
+    <path id="rp1" d="M18 136 Q48 150 78 136"/><path id="rp2" d="M8 146 Q48 166 88 146" opacity="0.7"/></g>
+  <path d="M12 118 H246 Q262 118 258 102 L250 96 H18 Q8 100 12 118 Z" fill="#fff" stroke="#000" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M18 96 Q16 58 52 46 L108 30 Q128 62 172 66 L226 74 Q254 80 250 96 Z" fill="#c6ff00" stroke="#000" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M112 40 L104 58 M126 50 L118 66 M140 56 L134 70" stroke="#000" stroke-width="6" stroke-linecap="round"/>
+  <path id="heel" d="M14 118 H74 V96 H18 Q8 100 14 118 Z" fill="#ff2e7e" stroke="#000" stroke-width="6" stroke-linejoin="round"/>
+</svg>
+        <span class="mid" id="ta" style="margin-top:16px;font-size:56px">ELAK IMPAK BERTERUSAN</span>
+        <span class="blk pink" id="tb2" style="font-size:66px">PADA TAPAK KAKI</span>
+      </div>
+
+      <!-- USP -->
+      <div id="ctr" class="g clip" data-start="29.55" data-duration="3.45" data-track-index="10" style="top:250px">
+        <div class="cara" id="cc">ADA SEKALI</div>
+        <span class="big" id="cb" style="font-size:98px">DIGITAL<br>COUNTER</span>
+        <div class="row" style="margin-top:18px"><span class="pill lime" id="cp1"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#c6ff00" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>STEPS</span><span class="pill yellow" id="cp2"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#000"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#ffd400" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>MASA</span><span class="pill pink" id="cp3"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#c6ff00"/><path d="M18 33 L28 43 L47 22" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>KALORI</span></div>
+      </div>
+      <div id="wt" class="g clip" data-start="33.05" data-duration="3.95" data-track-index="10" style="top:230px">
+        <div class="cara" id="wc">TAK BERAT</div>
+        <span class="mid" id="wa">RINGAN, MUDAH ALIH</span>
+      </div>
+      <div id="u1ring" class="g clip" data-start="33.60" data-duration="3.40" data-track-index="11" style="left:0;top:0;width:1080px;height:1920px">
+        <svg width="1080" height="1920" style="position:absolute;inset:0"><circle id="ring6" cx="735" cy="770" r="125" fill="none" stroke="#c6ff00" stroke-width="14"/></svg>
+        <span class="blk" id="kgtag" style="position:absolute;left:600px;top:560px;font-size:90px">5.9KG</span>
+      </div>
+
+      <!-- CTA -->
+      <div id="c1" class="g clip" data-start="37.05" data-duration="2.95" data-track-index="10" style="top:230px">
+        <div id="cal"><div class="rings"><i></i><i></i></div>
+  <div class="card"><div class="hdr">JANUARI</div><div class="yr">2027</div></div>
+  <div class="card page" id="calold"><div class="hdr" style="background:#888">DISEMBER</div><div class="yr" style="color:#888">2026</div></div></div>
+        <span class="mid" id="c1a" style="margin-top:34px">RAYA 2027</span>
+        <span class="blk" id="c1b" style="font-size:80px">NAK BADAN FIT?</span>
+      </div>
+      <div id="cta" class="g clip" data-start="40.05" data-duration="3.95" data-track-index="10" style="top:330px">
+        <div class="card" id="ctacard"><div class="b" style="font-size:100px">START STEPPER<br>SEKARANG!</div></div>
+      </div>
+
+      <div id="flash" class="layer"></div>
+      <div id="progress"></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#v0",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},0.00);
+      tl.to("#v0",{scale:1.0,duration:3.15,ease:"none"},0.35);
+      tl.fromTo("#v1",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},3.50);
+      tl.to("#v1",{scale:1.0,duration:7.65,ease:"none"},3.85);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},3.50);
+      tl.fromTo("#v2",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},11.50);
+      tl.to("#v2",{scale:1.0,duration:6.65,ease:"none"},11.85);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},11.50);
+      tl.fromTo("#v3",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},18.50);
+      tl.to("#v3",{scale:1.0,duration:5.65,ease:"none"},18.85);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},18.50);
+      tl.fromTo("#v4",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},24.50);
+      tl.to("#v4",{scale:1.0,duration:4.65,ease:"none"},24.85);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},24.50);
+      tl.fromTo("#v5",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},29.50);
+      tl.to("#v5",{scale:1.0,duration:3.15,ease:"none"},29.85);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},29.50);
+      tl.fromTo("#v6",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},33.00);
+      tl.to("#v6",{scale:1.0,duration:3.65,ease:"none"},33.35);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},33.00);
+      tl.fromTo("#v7",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},37.00);
+      tl.to("#v7",{scale:1.0,duration:2.65,ease:"none"},37.35);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},37.00);
+      tl.fromTo("#v8",{scale:1.18},{scale:1.04,duration:0.35,ease:"power3.out"},40.00);
+      tl.to("#v8",{scale:1.0,duration:3.65,ease:"none"},40.35);
+      tl.fromTo("#flash",{opacity:0.75},{opacity:0,duration:0.14,ease:"power1.out",immediateRender:false},40.00);
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: 44.0, ease: "none" }, 0);
+
+      // hook
+      tl.fromTo("#h1", { x: -1100 }, { x: 0, duration: 0.3, ease: "power4.out" }, 0.05);
+      tl.fromTo("#h1b", { x: 1100 }, { x: 0, duration: 0.3, ease: "power4.out" }, 0.35);
+      tl.fromTo("#hvs", { scale: 0, rotation: -180 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2.5)" }, 0.65);
+      tl.to("#root", { keyframes: { x: [0, -14, 12, -8, 6, 0] }, duration: 0.25 }, 0.75);
+      tl.to("#hvs", { scale: 1.15, duration: 0.2, yoyo: true, repeat: 5, ease: "sine.inOut" }, 1.2);
+      tl.fromTo("#h2", { scale: 0, rotation: -20 }, { scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }, 1.2);
+
+      // edu 1 kalori
+      tl.fromTo("#e1h", { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 3.55);
+      tl.fromTo("#e1", { y: 400, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" }, 3.70);
+      tl.fromTo("#cr0", { x: -900, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 4.10);
+      tl.fromTo(["#sb0", "#bb0"], { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out", stagger: 0.15 }, 4.25);
+      tl.fromTo("#cr1", { x: -900, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 4.90);
+      tl.fromTo(["#sb1", "#bb1"], { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out", stagger: 0.15 }, 5.05);
+      tl.fromTo("#cr2", { x: -900, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 5.70);
+      tl.fromTo(["#sb2", "#bb2"], { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out", stagger: 0.15 }, 5.85);
+      tl.fromTo("#cr3", { x: -900, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 6.50);
+      tl.fromTo(["#sb3", "#bb3"], { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out", stagger: 0.15 }, 6.65);
+      tl.fromTo("#cr4", { x: -900, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 7.30);
+      tl.fromTo(["#sb4", "#bb4"], { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out", stagger: 0.15 }, 7.45);
+      tl.fromTo("#cr5", { x: -900, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 8.10);
+      tl.fromTo(["#sb5", "#bb5"], { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power2.out", stagger: 0.15 }, 8.25);
+      tl.fromTo("#e1n", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 9.10);
+      tl.fromTo("#e1x", { scale: 0, rotation: 15 }, { scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }, 9.50);
+      tl.to("#root", { keyframes: { x: [0, 12, -10, 6, 0] }, duration: 0.22 }, 9.60);
+
+      // edu 2 otot & koordinasi
+      tl.fromTo("#e2h", { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 11.55);
+      tl.fromTo("#e2", { y: 400, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" }, 11.70);
+      tl.fromTo(["#s1 > *", "#s2 > *"], { opacity: 0 }, { opacity: 1, duration: 0.2, stagger: 0.1 }, 12.30);
+      tl.fromTo(["#b1 > *", "#b2 > *"], { opacity: 0 }, { opacity: 1, duration: 0.2, stagger: 0.12 }, 13.10);
+      tl.to(["#b1", "#b2", "#s1", "#s2"], { opacity: 0.55, duration: 0.3, yoyo: true, repeat: 7, ease: "sine.inOut" }, 14.90);
+      tl.fromTo(["#sm1", "#sm2"], { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.5)", stagger: 0.4 }, 12.90);
+      tl.fromTo(["#bm1", "#bm2"], { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.5)", stagger: 0.4 }, 13.90);
+      tl.fromTo(["#sm3", "#sm4"], { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.5)", stagger: 0.5 }, 14.90);
+      tl.fromTo("#e2n", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 16.10);
+
+      // edu 3 ruang & peralatan
+      tl.fromTo("#e3h", { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.2)" }, 18.55);
+      tl.fromTo("#e3", { y: 400, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" }, 18.70);
+      tl.fromTo("#e3vs", { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.5)" }, 19.00);
+      tl.to("#pedL2", { y: 24, duration: 0.3, yoyo: true, repeat: 9, ease: "sine.inOut" }, 19.10);
+      tl.fromTo("#pedR2", { y: 24 }, { y: 0, duration: 0.3, yoyo: true, repeat: 9, ease: "sine.inOut" }, 19.10);
+      tl.to("#wlegA2", { rotation: 18, transformOrigin: "108px 124px", duration: 0.3, yoyo: true, repeat: 9, ease: "sine.inOut" }, 19.10);
+      tl.to("#wlegB2", { rotation: -18, transformOrigin: "108px 124px", duration: 0.3, yoyo: true, repeat: 9, ease: "sine.inOut" }, 19.10);
+      tl.fromTo("#warr2", { x: -30 }, { x: 10, duration: 0.6, yoyo: true, repeat: 4, ease: "sine.inOut" }, 19.10);
+      tl.fromTo(["#sr1", "#br1", "#sr2", "#br2", "#sr3", "#br3"], { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.5)", stagger: 0.55 }, 19.70);
+
+      // tips
+      tl.fromTo("#tb", { scale: 0, rotation: -15 }, { scale: 1, rotation: 0, duration: 0.3, ease: "back.out(2.5)" }, 24.55);
+      tl.fromTo("#tt", { x: 1100 }, { x: 0, duration: 0.3, ease: "power4.out" }, 24.80);
+      tl.fromTo("#shoe", { y: -400, rotation: -10 }, { y: 0, rotation: 0, duration: 0.45, ease: "bounce.out" }, 25.20);
+      tl.fromTo("#ripples path", { scale: 0.4, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1.2, opacity: 1, duration: 0.5, stagger: 0.12, repeat: 4, ease: "power1.out" }, 25.65);
+      tl.fromTo("#heel", { opacity: 0.3 }, { opacity: 1, duration: 0.25, yoyo: true, repeat: 7 }, 25.65);
+      tl.fromTo("#ta", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25 }, 26.30);
+      tl.fromTo("#tb2", { scale: 0, rotation: 15 }, { scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }, 26.80);
+
+      // USP digital counter
+      tl.fromTo("#cc", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25 }, 29.60);
+      tl.fromTo("#cb", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(1.8)" }, 29.85);
+      tl.fromTo(["#cp1","#cp2","#cp3"], { scale: 0 }, { scale: 1, duration: 0.3, ease: "back.out(2.5)", stagger: 0.4 }, 30.80);
+      // USP tak berat
+      tl.fromTo("#wc", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25 }, 33.10);
+      tl.fromTo("#wa", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 33.25);
+      tl.fromTo("#ring6", { scale: 2.5, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(1.8)" }, 33.60);
+      tl.to("#ring6", { scale: 1.08, duration: 0.3, yoyo: true, repeat: 5, ease: "sine.inOut", transformOrigin: "50% 50%" }, 34.00);
+      tl.fromTo("#kgtag", { scale: 0, rotation: 20 }, { scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.5)" }, 33.80);
+
+      // CTA
+      tl.fromTo("#cal", { y: -500, rotation: -8 }, { y: 0, rotation: 0, duration: 0.4, ease: "back.out(1.6)" }, 37.05);
+      tl.fromTo("#calold", { rotationX: 0 }, { rotationX: -100, opacity: 0, duration: 0.45, ease: "power2.in" }, 37.50);
+      tl.fromTo("#c1a", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25 }, 38.00);
+      tl.fromTo("#c1b", { scale: 0, rotation: 15 }, { scale: 1, rotation: -3, duration: 0.3, ease: "back.out(2.2)" }, 38.30);
+      tl.to("#root", { keyframes: { y: [0, 12, -10, 6, 0] }, duration: 0.22 }, 38.40);
+      tl.fromTo("#ctacard", { scale: 0, rotation: -8 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2)" }, 40.10);
+      tl.to("#ctacard", { scale: 1.06, duration: 0.25, yoyo: true, repeat: 9, ease: "sine.inOut" }, 40.70);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
